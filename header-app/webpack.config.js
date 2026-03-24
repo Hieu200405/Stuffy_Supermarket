@@ -6,6 +6,13 @@ module.exports = {
 
   entry: "./src/index.js",
 
+  devServer: {
+    port: 3001,
+    historyApiFallback: true,
+    hot: false,
+    liveReload: true,
+  },
+
   experiments: {
     outputModule: false,
   },

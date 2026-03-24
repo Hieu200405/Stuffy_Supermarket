@@ -8,6 +8,8 @@ module.exports = {
   devServer: {
     port: 3000,
     historyApiFallback: true,
+    hot: false,
+    liveReload: true,
   },
 
   output: {
@@ -16,6 +18,13 @@ module.exports = {
 
   module: {
     rules: [
+      {
+        test: /\.m?js$/,
+        type: "javascript/auto",
+        resolve: {
+          fullySpecified: false,
+        },
+      },
       {
         test: /\.jsx?$/,
         use: "babel-loader",
@@ -33,8 +42,10 @@ module.exports = {
       name: "container",
 
       remotes: {
-        // Sẽ thêm sau (Ngày 9-10)
-        // product: "product@http://localhost:3001/remoteEntry.js"
+        header: "header@http://localhost:3001/remoteEntry.js",
+        product: "product@http://localhost:3002/remoteEntry.js",
+        cart: "cart@http://localhost:3003/remoteEntry.js",
+        admin: "admin@http://localhost:3004/remoteEntry.js",
       },
 
       shared: {
