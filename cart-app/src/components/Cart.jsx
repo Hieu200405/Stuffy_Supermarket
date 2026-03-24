@@ -1,10 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Cart = () => {
   const [items, setItems] = useState([
     { id: 1, name: "Iphone 15", price: 1000, quantity: 1 },
     { id: 2, name: "Macbook", price: 2000, quantity: 1 },
   ]);
+
+  useEffect(() => {
+    const handleAddToCart = (e) => {
+      const newProduct = e.detail;
+      setItems((prevItems) => {
+        const existing = prevItems.find((item) => item.id === newProduct.id);
+        if (existing) {
+          return prevItems.map((item) =>
+            item.id === newProduct.id ? { ...item, quantity: item.quantity + 1 } : item
+          );
+        }
+        return [...prevItems, { ...newProduct, quantity: 1 }];
+      });
+    };
+
+    window.addEventListener("ADD_TO_CART", handleAddToCart);
+    return () => window.removeEventListener("ADD_TO_CART", handleAddToCart);
+  }, []);
 
   const increase = (id) => {
     setItems(items.map(item =>
