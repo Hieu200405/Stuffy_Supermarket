@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { ModuleFederationPlugin } = require("webpack").container;
 
 module.exports = {
   mode: "development",
@@ -37,6 +38,17 @@ module.exports = {
   },
 
   plugins: [
+    new ModuleFederationPlugin({
+      name: "admin",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./App": "./src/App",
+      },
+      shared: {
+        react: { singleton: true, requiredVersion: false },
+        "react-dom": { singleton: true, requiredVersion: false },
+      },
+    }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),
