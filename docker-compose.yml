@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  container:
+    build:
+      context: ./container
+    ports:
+      - "3000:80"
+
+  header-app:
+    build:
+      context: ./header-app
+    ports:
+      - "3001:80"
+
+  product-app:
+    build:
+      context: ./product-app
+    ports:
+      - "3002:80"
+
+  cart-app:
+    build:
+      context: ./cart-app
+    ports:
+      - "3003:80"
+
+  admin-app:
+    build:
+      context: ./admin-app
+    ports:
+      - "3004:80"
