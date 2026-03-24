@@ -42,10 +42,10 @@ module.exports = {
       name: "container",
 
       remotes: {
-        header: "header@http://localhost:3001/remoteEntry.js",
-        product: "product@http://localhost:3002/remoteEntry.js",
-        cart: "cart@http://localhost:3003/remoteEntry.js",
-        admin: "admin@http://localhost:3004/remoteEntry.js",
+        header: "header@https://stuffy-header-app.onrender.com/remoteEntry.js",
+        product: "product@https://stuffy-product-app.onrender.com/remoteEntry.js",
+        cart: "cart@https://stuffy-cart-app.onrender.com/remoteEntry.js",
+        admin: "admin@https://stuffy-admin-app.onrender.com/remoteEntry.js",
       },
 
       shared: {

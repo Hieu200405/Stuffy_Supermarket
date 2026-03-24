@@ -2,9 +2,9 @@ name: Micro Frontend CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
 
 jobs:
   build-and-push-dockerhub:
@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         app: [header-app, product-app, cart-app, admin-app, container]
-    
+
     steps:
       - name: Tải mã nguồn
         uses: actions/checkout@v3
@@ -44,12 +44,3 @@ jobs:
       - name: Kích hoạt Webhook Deploy của Render
         run: |
           echo "Sending deployment trigger to Render servers..."
-          
-          # Hướng dẫn: Mở Render Web Services -> Settings -> Copy "Deploy Hook URL"
-          # Sau đó ném vào GitHub Secrets ứng với 5 biến này để nó tự động kích hoạt deploy:
-          
-          # curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_HEADER }}
-          # curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_PRODUCT }}
-          # curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_CART }}
-          # curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_ADMIN }}
-          # curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_CONTAINER }}
