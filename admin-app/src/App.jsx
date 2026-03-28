@@ -51,19 +51,24 @@ const App = () => {
 
   return (
     <div>
-      <h1 style={{ color: "#6366f1", marginBottom: "20px" }}>Kho Điều Khiển Trung Tâm (Trực Tuyến Database)</h1>
+      <div style={{ marginBottom: "30px", borderBottom: '1px solid var(--border-light)', paddingBottom: '20px' }}>
+        <h1 style={{ color: "var(--text-main)", margin: "0 0 10px 0", fontSize: '2.2rem', fontWeight: '800' }}>Trung Tâm Điều Khiển Nhịp Đập</h1>
+        <p style={{ margin: 0, color: 'var(--text-muted)' }}>Mọi thay đổi giá sẽ được truyền Sóng Real-time thẳng xuống máy khách.</p>
+      </div>
 
-      <ProductForm
-        onAdd={addProduct}
-        onUpdate={updateProduct}
-        editing={editing}
-      />
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 350px) 1fr', gap: '30px', alignItems: 'start' }}>
+        <ProductForm
+          onAdd={addProduct}
+          onUpdate={updateProduct}
+          editing={editing}
+        />
 
-      <ProductList
-        products={products}
-        onDelete={deleteProduct}
-        onEdit={startEdit}
-      />
+        <ProductList
+          products={products}
+          onDelete={deleteProduct}
+          onEdit={startEdit}
+        />
+      </div>
     </div>
   );
 };
