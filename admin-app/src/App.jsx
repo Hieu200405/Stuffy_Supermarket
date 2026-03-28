@@ -8,7 +8,7 @@ const App = () => {
 
   // KÉO DATA SỐNG TỪ BACKEND
   const fetchProducts = () => {
-    fetch("http://localhost:5000/api/products")
+    fetch("https://stuffy-backend-api.onrender.com/api/products")
       .then(res => res.json())
       .then(data => setProducts(data));
   };
@@ -18,7 +18,7 @@ const App = () => {
   }, []);
 
   const addProduct = (product) => {
-    fetch("http://localhost:5000/api/products", {
+    fetch("https://stuffy-backend-api.onrender.com/api/products", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: product.name, price: Number(product.price) })
@@ -28,7 +28,7 @@ const App = () => {
   };
 
   const updateProduct = (updated) => {
-    fetch(`http://localhost:5000/api/products/${updated.id}`, {
+    fetch(`https://stuffy-backend-api.onrender.com/api/products/${updated.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: updated.name, price: Number(updated.price) })
@@ -41,7 +41,7 @@ const App = () => {
   };
 
   const deleteProduct = (id) => {
-    fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' })
+    fetch(`https://stuffy-backend-api.onrender.com/api/products/${id}`, { method: 'DELETE' })
     .then(() => setProducts(products.filter(p => p.id !== id)));
   };
 

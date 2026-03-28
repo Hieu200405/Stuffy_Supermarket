@@ -5,7 +5,7 @@ import GlassCard from "design_system/GlassCard";
 import { io } from "socket.io-client";
 
 // Khớp nối kết nối ăng-ten liên tục với Trạm phát thanh Backend
-const socket = io("http://localhost:5000");
+const socket = io("https://stuffy-backend-api.onrender.com");
 
 export default function ProductList() {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -15,7 +15,7 @@ export default function ProductList() {
   const [flashingId, setFlashingId] = useState(null); // Lưu trữ ID của hàng hoá bị Sờ Gáy
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
+    fetch("https://stuffy-backend-api.onrender.com/api/products")
       .then(res => res.json())
       .then(data => {
         setProducts(data);
