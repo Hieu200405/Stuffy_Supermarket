@@ -74,7 +74,7 @@ export default function ProductList() {
          <h2 style={{ fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>Quầy Hàng Real-time 📈</h2>
          
          {/* Phù hiệu báo cáo Đang Cắm Cáp Live Sync như Youtube/Facebook */}
-         <span style={{ background: '#0f172a', color: '#f8fafc', padding: '6px 15px', borderRadius: '30px', border: '1px solid #334155', display: 'flex', alignItems: 'center', gap: '8px' }}>
+         <span style={{ background: '#e2e8f0', color: '#1e293b', padding: '6px 15px', borderRadius: '30px', border: '1px solid #cbd5e1', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ width: '10px', height: '10px', background: '#22c55e', borderRadius: '50%', boxShadow: '0 0 10px #22c55e', animation: 'blink 1s infinite alternate' }}></span>
             <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>Trực tuyến Live Stream Server</span>
          </span>
@@ -89,7 +89,7 @@ export default function ProductList() {
               transition: "all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
               // THUẬT TOÁN KÍCH NHIỆT (Đổ bóng 3D, phóng to)
               transform: isFlashing ? "scale(1.08) translateY(-10px)" : "scale(1)",
-              border: isFlashing ? "2px solid #ef4444" : "1px solid rgba(255, 255, 255, 0.1)",
+              border: isFlashing ? "2px solid #ef4444" : "1px solid rgba(0, 0, 0, 0.05)",
               boxShadow: isFlashing ? "0 0 40px rgba(239, 68, 68, 0.6), inset 0 0 20px rgba(239, 68, 68, 0.3)" : ""
             }}>
               <img src={p.image} alt={p.name} style={{ width: "100%", borderRadius: "8px", marginBottom: "15px" }} />
