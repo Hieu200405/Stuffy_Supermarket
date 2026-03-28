@@ -9,10 +9,10 @@ on:
 jobs:
   build-and-push-dockerhub:
     runs-on: ubuntu-latest
-    # Dùng tính năng matrix để lặp lại việc build tự động cho cả 5 apps cùng một lúc
+    # Dùng tính năng matrix để lặp lại việc build tự động cho toàn bộ Bát Quái MFE + Backend
     strategy:
       matrix:
-        app: [header-app, product-app, cart-app, admin-app, container]
+        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, backend-api]
 
     steps:
       - name: Tải mã nguồn
