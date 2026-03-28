@@ -36,10 +36,10 @@ const Cart = () => {
               </div>
               
               <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "rgba(255,255,255,0.05)", padding: "5px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <button onClick={() => decreaseQuantity(item.id)} style={{ background: "transparent", border: "none", color: "white", cursor: "pointer", fontSize: "1.2rem", padding: "0 10px" }}>-</button>
-                  <span style={{ fontWeight: "bold", width: "20px", textAlign: "center" }}>{item.quantity}</span>
-                  <button onClick={() => increaseQuantity(item.id)} style={{ background: "transparent", border: "none", color: "white", cursor: "pointer", fontSize: "1.2rem", padding: "0 10px" }}>+</button>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "rgba(0,0,0,0.05)", padding: "5px", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.1)" }}>
+                  <button onClick={() => decreaseQuantity(item.id)} style={{ background: "transparent", border: "none", color: "#1e293b", cursor: "pointer", fontSize: "1.2rem", padding: "0 10px" }}>-</button>
+                  <span style={{ fontWeight: "bold", width: "20px", textAlign: "center", color: "#1e293b" }}>{item.quantity}</span>
+                  <button onClick={() => increaseQuantity(item.id)} style={{ background: "transparent", border: "none", color: "#1e293b", cursor: "pointer", fontSize: "1.2rem", padding: "0 10px" }}>+</button>
                 </div>
                 <Button onClick={() => removeFromCart(item.id)} style={{ background: "transparent", border: "1px solid rgba(239, 68, 68, 0.5)", color: "#ef4444", padding: "8px 15px", boxShadow: "none" }}>
                   Bỏ
@@ -48,10 +48,10 @@ const Cart = () => {
             </GlassCard>
           ))}
 
-          <GlassCard style={{ marginTop: "10px", border: "1px solid rgba(168, 85, 247, 0.5)", background: "rgba(168, 85, 247, 0.15)" }}>
+          <GlassCard style={{ marginTop: "10px", border: "1px solid rgba(168, 85, 247, 0.5)", background: "rgba(168, 85, 247, 0.1)" }}>
             <h3 style={{ margin: 0, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span>Tổng thanh toán:</span>
-              <span style={{ color: "#fff", fontSize: "1.8rem" }}>${total}</span>
+              <span style={{ color: "#1e293b" }}>Tổng thanh toán:</span>
+              <span style={{ color: "#1e293b", fontSize: "1.8rem" }}>${total}</span>
             </h3>
             <Button style={{ width: "100%", marginTop: "20px", fontSize: "1.2rem", padding: "15px" }}>
               💳 Quẹt Thẻ Tính Tiền 🚀

@@ -26,14 +26,14 @@ const ProtectedModule = ({ children, moduleName }) => (
 const Navbar = () => {
   const location = useLocation();
   const getStyle = (path) => ({
-    color: 'white', textDecoration: 'none', fontWeight: 'bold', padding: '10px 20px', borderRadius: '12px',
-    background: location.pathname === path ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
-    border: location.pathname === path ? '1px solid rgba(99, 102, 241, 0.5)' : '1px solid transparent',
+    color: '#1e293b', textDecoration: 'none', fontWeight: 'bold', padding: '10px 20px', borderRadius: '12px',
+    background: location.pathname === path ? 'rgba(79, 70, 229, 0.1)' : 'transparent',
+    border: location.pathname === path ? '1px solid rgba(79, 70, 229, 0.3)' : '1px solid transparent',
     transition: 'all 0.3s'
   });
 
   return (
-    <div style={{ display: 'flex', gap: '15px', padding: '15px 30px', background: 'rgba(0,0,0,0.2)', borderBottom: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)' }}>
+    <div style={{ display: 'flex', gap: '15px', padding: '15px 30px', background: 'rgba(255, 255, 255, 0.6)', borderBottom: '1px solid rgba(0, 0, 0, 0.05)', backdropFilter: 'blur(10px)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
       <Link to="/" style={getStyle('/')}>🛍 Tủ Kính Sản Phẩm</Link>
       <Link to="/cart" style={getStyle('/cart')}>🛒 Máy Quẹt Thẻ (Giỏ Hàng)</Link>
       <Link to="/admin" style={{ ...getStyle('/admin'), marginLeft: 'auto', color: '#ef4444', borderColor: location.pathname === '/admin' ? '#ef4444' : 'transparent' }}>⚙️ Hầm Quản Trị Hệ Thống</Link>
