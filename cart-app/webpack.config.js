@@ -42,6 +42,11 @@ module.exports = {
       name: "cart",
       filename: "remoteEntry.js",
 
+      remotes: {
+        store: "store@http://localhost:3005/remoteEntry.js",
+        design_system: "design_system@http://localhost:3006/remoteEntry.js",
+      },
+
       exposes: {
         "./Cart": "./src/components/Cart",
       },
@@ -49,6 +54,7 @@ module.exports = {
       shared: {
         react: { singleton: true, requiredVersion: false },
         "react-dom": { singleton: true, requiredVersion: false },
+        zustand: { singleton: true, requiredVersion: false },
       },
     }),
 

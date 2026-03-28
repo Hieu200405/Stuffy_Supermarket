@@ -46,11 +46,14 @@ module.exports = {
         product: "product@https://stuffy-product-app.onrender.com/remoteEntry.js",
         cart: "cart@https://stuffy-cart-app.onrender.com/remoteEntry.js",
         admin: "admin@https://stuffy-admin-app.onrender.com/remoteEntry.js",
+        store: "store@http://localhost:3005/remoteEntry.js",
+        design_system: "design_system@http://localhost:3006/remoteEntry.js",
       },
 
       shared: {
         react: { singleton: true, requiredVersion: false },
         "react-dom": { singleton: true, requiredVersion: false },
+        zustand: { singleton: true, requiredVersion: false },
       },
     }),
 
