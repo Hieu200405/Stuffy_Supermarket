@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import "design_system/styles";
 import ErrorBoundary from "./components/ErrorBoundary";
+import MobileScanner from "./pages/MobileScanner";
 
 const Header = React.lazy(() => import("header/Header"));
 const ProductList = React.lazy(() => import("product/ProductList"));
@@ -60,6 +61,7 @@ export default function App() {
             } />
             <Route path="/cart" element={<ProtectedModule moduleName="Thu Ngân"><Cart /></ProtectedModule>} />
             <Route path="/admin" element={<ProtectedModule moduleName="Admin"><Admin /></ProtectedModule>} />
+            <Route path="/scanner/:sessionCode" element={<MobileScanner />} />
           </Routes>
         </main>
       </div>

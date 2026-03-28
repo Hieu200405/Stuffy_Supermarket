@@ -1,0 +1,82 @@
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { io } from "socket.io-client";
+
+const socket = io("https://stuffy-backend-api.onrender.com");
+
+// KỊCH BẢN ĐIỆN THOẠI DI ĐỘNG: QUÉT MÃ VẠCH (Giả lập màn hình dọc Điện thoại)
+export default function MobileScanner() {
+  const { sessionCode } = useParams();
+  const [products, setProducts] = useState([]);
+  const [scannedId, setScannedId] = useState(null);
+
+  useEffect(() => {
+    // Kéo danh mục hàng sống từ Server
+    fetch("https://stuffy-backend-api.onrender.com/api/products")
+      .then(res => res.json())
+      .then(data => setProducts(data));
+      
+    // Điện thoại cũng tham gia vào Kênh vô tuyến
+    socket.emit("JOIN_CART_SESSION", sessionCode);
+  }, [sessionCode]);
+
+  const handleScan = (product) => {
+    // Rung điện thoại nhè nhẹ (Hỗ trợ trình duyệt xịn)
+    if (navigator.vibrate) navigator.vibrate(50);
+    
+    // Bắn sóng thẳng sản phẩm này sang Màn hình Laptop!
+    socket.emit("MOBILE_SCAN_ITEM", { sessionCode, product });
+    
+    setScannedId(product.id);
+    setTimeout(() => setScannedId(null), 800);
+  };
+
+  return (
+    <div style={{ maxWidth: '400px', margin: '0 auto', background: '#0f172a', minHeight: '100vh', padding: '20px', color: 'white', borderRadius: '30px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '30px', marginTop: '10px' }}>
+        <h2 style={{ fontSize: '1.5rem', margin: '0 0 5px 0' }}>📱 SmartScanner POS</h2>
+        <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>Đã đồng bộ với Màn chiếu mã: <strong style={{color: '#22c55e'}}>{sessionCode}</strong></p>
+      </div>
+
+      <div style={{ padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.2)', marginBottom: '30px', textAlign: 'center' }}>
+        <p style={{ margin: 0, opacity: 0.6 }}>Hướng Camera vào món đồ để đưa vào giỏ hàng Laptop</p>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        {products.map(p => {
+          const isScanning = scannedId === p.id;
+          return (
+            <div 
+              key={p.id} 
+              onClick={() => handleScan(p)}
+              style={{ 
+                background: isScanning ? '#22c55e' : 'rgba(255,255,255,0.1)', 
+                padding: '15px', 
+                borderRadius: '12px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '15px',
+                transition: 'all 0.2s',
+                transform: isScanning ? 'scale(0.95)' : 'scale(1)',
+                cursor: 'pointer'
+              }}
+            >
+              <img src={p.image} style={{ width: '50px', height: '50px', background: 'white', borderRadius: '8px', objectFit: 'contain' }} />
+              <div style={{ flex: 1 }}>
+                <h4 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', color: isScanning ? '#000' : 'white' }}>{p.name}</h4>
+                <p style={{ margin: 0, color: isScanning ? 'rgba(0,0,0,0.6)' : '#a855f7', fontWeight: 'bold' }}>${p.price}</p>
+              </div>
+              <div style={{ fontSize: '1.5rem' }}>
+                {isScanning ? '✅' : '📷'}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      
+      <div style={{ textAlign: 'center', marginTop: '40px', color: '#64748b', fontSize: '0.8rem' }}>
+        Powered by Stuffy Omni-channel AI
+      </div>
+    </div>
+  );
+}
