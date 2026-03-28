@@ -43,4 +43,12 @@ jobs:
     steps:
       - name: Kích hoạt Webhook Deploy của Render
         run: |
-          echo "Sending deployment trigger to Render servers..."
+          echo "Kích hoạt tự động cập nhật Web server Render từ Github Actions..."
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_CONTAINER }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_HEADER }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_PRODUCT }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_CART }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_ADMIN }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_STORE }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_DESIGN_SYSTEM }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }} > /dev/null || true
