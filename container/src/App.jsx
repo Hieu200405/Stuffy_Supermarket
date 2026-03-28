@@ -1,4 +1,5 @@
 import React, { Suspense } from "react";
+import "design_system/styles";
 
 const Header = React.lazy(() => import("header/Header"));
 const ProductList = React.lazy(() => import("product/ProductList"));

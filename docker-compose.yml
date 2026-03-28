@@ -30,3 +30,15 @@ services:
       context: ./admin-app
     ports:
       - "3004:80"
+
+  store-app:
+    build:
+      context: ./store-app
+    ports:
+      - "3005:80"
+
+  design-system-app:
+    build:
+      context: ./design-system-app
+    ports:
+      - "3006:80"
