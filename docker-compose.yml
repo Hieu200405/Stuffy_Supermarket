@@ -42,3 +42,24 @@ services:
       context: ./design-system-app
     ports:
       - "3006:80"
+
+  # THÊM MỚI 2 CORE BACKEND LÕI:
+  backend-api:
+    build:
+      context: ./backend-api
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/stuffy_db
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
