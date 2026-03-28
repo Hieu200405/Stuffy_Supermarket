@@ -16,6 +16,19 @@ const io = new Server(server, { cors: { origin: '*' } });
 // Đài phát thanh xác nhận người nghe
 io.on('connection', (socket) => {
   console.log('⚡ Một Khách hàng siêu thị vừa kết nối Live Sync:', socket.id);
+
+  // Nhận mã PIN từ Màn hình Desktop cắm tại siêu thị
+  socket.on('JOIN_CART_SESSION', (sessionCode) => {
+    socket.join(sessionCode);
+    console.log(`🖥️ Màn hình Desktop vừa mở Tần số giỏ hàng khẩn cấp: ${sessionCode}`);
+  });
+
+  // Khi Điện thoại khách hàng Quét Món đồ và bắn sóng lên Server
+  socket.on('MOBILE_SCAN_ITEM', ({ sessionCode, product }) => {
+    console.log(`📱 Bíp! Điện thoại vừa gắp ${product.name} ném thẳng vào Giỏ màn hình ${sessionCode}!`);
+    // Dội sóng thẳng xuống đích danh Màn hình Desktop Đủ mã PIN
+    io.to(sessionCode).emit('DESKTOP_RECEIVE_ITEM', product);
+  });
 });
 
 const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/stuffy_db';

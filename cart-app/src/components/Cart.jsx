@@ -1,10 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useCartStore } from "store/store";
 import Button from "design_system/Button";
+import { io } from "socket.io-client";
+
+const socket = io("https://stuffy-backend-api.onrender.com");
+// Sinh một đoạn PIN ngẫu nhiên 4 chữ số cho phiên giao dịch
+const SESSION_CODE = Math.random().toString(36).substring(2, 6).toUpperCase();
 
 const Cart = () => {
-  const { cartItems, increaseQuantity, decreaseQuantity, removeFromCart, clearCart } = useCartStore();
+  const { cartItems, increaseQuantity, decreaseQuantity, removeFromCart, clearCart, addToCart } = useCartStore();
+  const [magicItem, setMagicItem] = useState(null);
+  
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  useEffect(() => {
+    // Bước 1: Khai báo với Server "Tui là Desktop, mã PIN của tui là đây"
+    socket.emit("JOIN_CART_SESSION", SESSION_CODE);
+    
+    // Bước 2: Dỏng tai lên nghe sự kiện từ Server (Phát sinh khi Phone bắn)
+    socket.on("DESKTOP_RECEIVE_ITEM", (product) => {
+      // Nhét thẳng vào kho Zustand
+      addToCart(product);
+      
+      // Bật hiệu ứng Đèn nhấp nháy
+      setMagicItem(product);
+      setTimeout(() => setMagicItem(null), 2500);
+    });
+
+    return () => {
+      socket.off("DESKTOP_RECEIVE_ITEM");
+    };
+  }, []);
 
   return (
     <div>
@@ -21,10 +47,21 @@ const Cart = () => {
       </div>
 
       {cartItems.length === 0 ? (
-        <div className="ds-glass-card" style={{ textAlign: 'center', padding: '80px 20px', background: '#f8fafc', border: '2px dashed var(--border-light)' }}>
-          <div style={{ fontSize: '5rem', opacity: 0.1, marginBottom: '20px' }}>🛒</div>
-          <h3 style={{ fontSize: '1.6rem', color: 'var(--text-main)', marginBottom: '10px', fontWeight: '800' }}>Giỏ hàng siêu trống rỗng!</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Hãy về lại Danh sách Cửa Hàng và bổ sung kho vũ khí ngay.</p>
+        <div style={{ display: 'flex', gap: '30px', alignItems: 'stretch' }}>
+          <div className="ds-glass-card" style={{ flex: 1, textAlign: 'center', padding: '80px 20px', background: '#f8fafc', border: '2px dashed var(--border-light)' }}>
+            <div style={{ fontSize: '5rem', opacity: 0.1, marginBottom: '20px' }}>🛒</div>
+            <h3 style={{ fontSize: '1.6rem', color: 'var(--text-main)', marginBottom: '10px', fontWeight: '800' }}>Giỏ hàng siêu trống rỗng!</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Hãy về lại Danh sách Cửa Hàng và bổ sung kho vũ khí ngay.</p>
+          </div>
+          
+          <div className="ds-glass-card" style={{ width: '380px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: 'white', textAlign: 'center', boxShadow: 'var(--shadow-lg)' }}>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.3rem', fontWeight: '800' }}>Scan & Go 📱</h3>
+            <p style={{ margin: '0 0 20px 0', fontSize: '0.9rem', opacity: 0.8 }}>Mở Camera điện thoại, quét mã này để biến điện thoại thành máy quét siêu thị.</p>
+            <div style={{ padding: '10px', background: 'white', borderRadius: '12px' }}>
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://localhost:3000/scanner/${SESSION_CODE}`} alt="QR Code" style={{ width: '100%', display: 'block' }} />
+            </div>
+            <p style={{ marginTop: '20px', fontSize: '1.1rem', letterSpacing: '2px', fontWeight: 'bold', color: '#38bdf8' }}>PIN: {SESSION_CODE}</p>
+          </div>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: "40px", alignItems: "start" }}>
@@ -90,9 +127,18 @@ const Cart = () => {
               Thanh Toán Ngay 🚀
             </Button>
             
-            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '20px', margin: '20px 0 0 0' }}>
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', margin: '20px 0 0 0' }}>
               🔒 Thanh toán an toàn 100% bằng Apple Pay / Stripe.
             </p>
+
+            {/* QR Code thu nhỏ vẫn duy trì để khách ném thêm đồ */}
+            <div style={{ marginTop: '25px', padding: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=http://localhost:3000/scanner/${SESSION_CODE}`} alt="QR Code Mini" style={{ width: '60px', height: '60px', borderRadius: '8px' }} />
+              <div>
+                <p style={{ margin: '0 0 5px 0', fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main)' }}>Scan & Go 📱</p>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>Mã PIN: <strong style={{color: 'var(--primary-color)'}}>{SESSION_CODE}</strong></p>
+              </div>
+            </div>
           </div>
           
         </div>
