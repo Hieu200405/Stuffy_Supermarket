@@ -49,6 +49,7 @@ module.exports = {
         admin: `admin@${getUrl('ADMIN_URL', 'https://stuffy-admin-app.onrender.com')}/remoteEntry.js`,
         store: `store@${getUrl('STORE_URL', 'https://stuffy-store-app.onrender.com')}/remoteEntry.js`,
         design_system: `design_system@${getUrl('DESIGN_SYSTEM_URL', 'https://stuffy-design-system-app.onrender.com')}/remoteEntry.js`,
+        viewer: `viewer@${getUrl('VIEWER_URL', 'https://stuffy-3d-viewer-app.onrender.com')}/remoteEntry.js`,
       },
 
       shared: {
