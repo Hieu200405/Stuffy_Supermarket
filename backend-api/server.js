@@ -39,8 +39,14 @@ mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 })
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany([
-        { name: "Camera IP V2", price: 50, image: "https://via.placeholder.com/150/6366f1/ffffff?text=Camera" },
-        { name: "Tai nghe RGB", price: 80, image: "https://via.placeholder.com/150/a855f7/ffffff?text=Headset" }
+        { name: "MacBook Pro M3 Max", price: 3499, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&q=80" },
+        { name: "Apple Vision Pro", price: 3499, image: "https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=400&q=80" },
+        { name: "Sony WH-1000XM5", price: 398, image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400&q=80" },
+        { name: "PlayStation 5", price: 499, image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400&q=80" },
+        { name: "Keychron Q1 Pro", price: 199, image: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=400&q=80" },
+        { name: "Logitech MX Master 3S", price: 99, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&q=80" },
+        { name: "GoPro Hero 12", price: 399, image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&q=80" },
+        { name: "Loa Marshall Stanmore", price: 379, image: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=400&q=80" }
       ]);
     }
   })
