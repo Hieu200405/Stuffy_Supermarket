@@ -7,8 +7,8 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "three": "^0.163.0",
-    "@react-three/fiber": "^8.16.1",
-    "@react-three/drei": "^9.105.4"
+    "@react-three/fiber": "^9.0.0-rc.10",
+    "@react-three/drei": "^10.0.0-rc.3"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
