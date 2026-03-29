@@ -9,10 +9,10 @@ on:
 jobs:
   build-and-push-dockerhub:
     runs-on: ubuntu-latest
-    # Dùng tính năng matrix để lặp lại việc build tự động cho toàn bộ Bát Quái MFE + Backend
+    # Dùng tính năng matrix để lặp lại việc build tự động cho toàn bộ MFE + Backend
     strategy:
       matrix:
-        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, backend-api]
+        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, 3d-viewer-app, backend-api]
 
     steps:
       - name: Tải mã nguồn
@@ -51,4 +51,5 @@ jobs:
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_ADMIN }} > /dev/null || true
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_STORE }} > /dev/null || true
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_DESIGN_SYSTEM }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_VIEWER }} > /dev/null || true
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }} > /dev/null || true

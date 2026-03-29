@@ -45,6 +45,7 @@ module.exports = {
       remotes: {
         store: "store@https://stuffy-store-app.onrender.com/remoteEntry.js",
         design_system: "design_system@https://stuffy-design-system-app.onrender.com/remoteEntry.js",
+        viewer: "viewer@https://stuffy-3d-viewer-app.onrender.com/remoteEntry.js",
       },
 
       exposes: {
