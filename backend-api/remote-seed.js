@@ -17,6 +17,12 @@ async function seedRemote() {
     const res = await fetch(baseURL);
     const currentProducts = await res.json();
     
+    if (!Array.isArray(currentProducts)) {
+      console.error("❌ Máy chủ Render từ chối hoặc máy chủ chết lâm sàng. Phản hồi:", currentProducts);
+      console.error("💡 Khả năng cao Server Render vẫn chưa nhận diện được MONGO_URI MongoDB Atlas. Bạn nhớ cài MONGO_URI lên Render rồi chờ nó xanh (Deploy Success) nhé!");
+      return;
+    }
+    
     console.log(`🧹 Đã quét thấy ${currentProducts.length} mặt hàng giả lưu trong kho. Tiến hành vứt rác...`);
     for (const p of currentProducts) {
       if (p.id) {
