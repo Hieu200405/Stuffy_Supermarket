@@ -3,6 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+# Nhận API Key từ CI/CD Secret lúc build (--build-arg)
+ARG GEMINI_API_KEY=""
+ENV GEMINI_API_KEY=$GEMINI_API_KEY
 RUN npx webpack --mode production
 
 FROM nginx:alpine

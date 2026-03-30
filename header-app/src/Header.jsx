@@ -1,4 +1,5 @@
 import React from 'react';
+import AISearchBar from './AISearchBar';
 
 export default function Header() {
   return (
@@ -24,14 +25,8 @@ export default function Header() {
         </h1>
       </div>
 
-      <div style={{ width: '450px', position: 'relative' }}>
-        <input 
-          type="text" 
-          placeholder="Bạn đang muốn tìm kiếm thứ gì?" 
-          style={{ width: '100%', padding: '14px 20px', paddingLeft: '50px', borderRadius: '99px', border: '1px solid var(--border-light)', background: '#f1f5f9', outline: 'none', fontFamily: 'inherit', fontSize: '1rem', transition: 'all 0.3s' }} 
-        />
-        <span style={{ position: 'absolute', left: '18px', top: '14px', opacity: 0.5, fontSize: '1.2rem' }}>🔍</span>
-      </div>
+      {/* 🤖 Thanh Tìm Kiếm AI thay thế ô search tĩnh */}
+      <AISearchBar />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
         <span style={{ fontWeight: '600', color: 'var(--text-muted)', cursor: 'pointer' }}>Hỗ trợ</span>

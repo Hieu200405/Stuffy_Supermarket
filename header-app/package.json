@@ -21,6 +21,7 @@
     "react-dom": "^19.2.4",
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.2",
-    "webpack-dev-server": "^5.2.3"
+    "webpack-dev-server": "^5.2.3",
+    "dotenv": "^16.4.5"
   }
 }
