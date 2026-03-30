@@ -35,6 +35,9 @@ jobs:
           file: ./${{ matrix.app }}/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ secrets.DOCKER_USERNAME }}/stuffy-${{ matrix.app }}:latest
+          # Truyền Gemini API Key vào lúc build (chỉ có tác dụng với header-app nhờ ARG trong Dockerfile)
+          build-args: |
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
   deploy-to-render:
     needs: build-and-push-dockerhub
