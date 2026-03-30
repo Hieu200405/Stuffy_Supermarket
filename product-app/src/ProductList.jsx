@@ -14,7 +14,8 @@ export default function ProductList() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [flashingId, setFlashingId] = useState(null);
-  const [active3DColor, setActive3DColor] = useState(null); // Quản lý Bật tắt AR
+  const [active3DColor, setActive3DColor] = useState(null);
+  const [aiMatches, setAiMatches] = useState(null); // null = không lọc, [] = không khớp, [...] = có khớp
 
   useEffect(() => {
     fetch("https://stuffy-backend-api.onrender.com/api/products")
@@ -31,10 +32,17 @@ export default function ProductList() {
     socket.on("NEW_PRODUCT", (newProduct) => setProducts((current) => [...current, newProduct]));
     socket.on("PRODUCT_DELETED", (id) => setProducts((current) => current.filter(p => p.id !== id)));
 
+    // Lắng nghe kết quả AI từ Header App (cross-MFE qua CustomEvent)
+    const handleAIResult = (e) => {
+      setAiMatches(e.detail.matches); // null = xóa filter
+    };
+    window.addEventListener('AI_SEARCH_RESULT', handleAIResult);
+    
     return () => {
       socket.off("PRICE_UPDATED");
       socket.off("NEW_PRODUCT");
       socket.off("PRODUCT_DELETED");
+      window.removeEventListener('AI_SEARCH_RESULT', handleAIResult);
     };
   }, []);
 
@@ -50,16 +58,46 @@ export default function ProductList() {
          </span>
       </div>
 
+      {/* Banner kết quả AI */}
+      {aiMatches !== null && (
+        <div style={{ marginBottom: '24px', padding: '14px 20px', background: 'linear-gradient(135deg,#eef2ff,#f5f3ff)', borderRadius: '14px', border: '1px solid #c7d2fe', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '1.3rem' }}>✨</span>
+            <div>
+              <p style={{ margin: 0, fontWeight: '800', color: '#4338ca', fontSize: '0.95rem' }}>AI tìm thấy {aiMatches.length} sản phẩm phù hợp</p>
+              <p style={{ margin: 0, color: '#6366f1', fontSize: '0.82rem' }}>Các sản phẩm khọc nhạt được lọc ra</p>
+            </div>
+          </div>
+          <button onClick={() => { setAiMatches(null); window.dispatchEvent(new CustomEvent('AI_SEARCH_RESET')); }} style={{ padding: '6px 16px', fontSize: '0.85rem', fontWeight: '700', color: '#6366f1', background: 'white', border: '1px solid #c7d2fe', borderRadius: '99px', cursor: 'pointer' }}>
+            × Xóa lọc
+          </button>
+        </div>
+      )}
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "30px" }}>
         {products.map((p) => {
           const isFlashing = flashingId === p.id;
+          // AI highlight: đứng vờ không biết khi nào match
+          const isAiMatch = aiMatches !== null && aiMatches.some(name => 
+            p.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(p.name.toLowerCase())
+          );
+          const isDimmed = aiMatches !== null && !isAiMatch;
           return (
             <div key={p.id} className="ds-glass-card" style={{ 
               display: "flex", flexDirection: "column",
-              transform: isFlashing ? "scale(1.05)" : "scale(1)",
-              border: isFlashing ? "2px solid #ef4444" : "",
-              boxShadow: isFlashing ? "0 20px 25px -5px rgba(239, 68, 68, 0.2)" : ""
+              transform: isFlashing ? "scale(1.05)" : isAiMatch ? "scale(1.03)" : "scale(1)",
+              border: isFlashing ? "2px solid #ef4444" : isAiMatch ? "2px solid #6366f1" : "",
+              boxShadow: isFlashing ? "0 20px 25px -5px rgba(239, 68, 68, 0.2)" : isAiMatch ? "0 20px 40px rgba(99,102,241,0.2)" : "",
+              opacity: isDimmed ? 0.35 : 1,
+              transition: 'all 0.4s',
+              position: 'relative',
             }}>
+              {/* Badge AI gợi ý */}
+              {isAiMatch && (
+                <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', fontSize: '0.7rem', fontWeight: '800', padding: '4px 10px', borderRadius: '99px', letterSpacing: '0.3px' }}>
+                  ✨ AI Gợi ý
+                </div>
+              )}
               {/* Product Image Frame */}
               <div style={{ background: '#f1f5f9', borderRadius: '12px', padding: '20px', marginBottom: '20px', display: 'flex', justifyContent: 'center', transition: 'all 0.3s' }}>
                 <img src={p.image} alt={p.name} style={{ width: "160px", height: "160px", objectFit: 'contain', mixBlendMode: 'multiply' }} />
