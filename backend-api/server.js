@@ -60,7 +60,10 @@ app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find();
     res.json(products.map(p => ({ id: p._id.toString(), name: p.name, price: p.price, image: p.image })));
-  } catch (e) { res.json([]); }
+  } catch (e) { 
+    console.error("Lỗi GET MongoDB:", e);
+    res.status(500).json({ error: "Lỗi kết nối cơ sở dữ liệu MongoDB Atlas" }); 
+  }
 });
 
 app.post('/api/products', async (req, res) => {
@@ -70,7 +73,10 @@ app.post('/api/products', async (req, res) => {
     const formatted = { id: newProduct._id.toString(), ...newProduct._doc };
     io.emit('NEW_PRODUCT', formatted); // 📡 Phát loa toàn phường: Hàng mới về!
     res.json(formatted);
-  } catch (e) { res.json({}); }
+  } catch (e) { 
+    console.error("Lỗi POST MongoDB:", e);
+    res.status(500).json({ error: "Không thể lưu sản phẩm" }); 
+  }
 });
 
 app.put('/api/products/:id', async (req, res) => {
@@ -82,7 +88,10 @@ app.put('/api/products/:id', async (req, res) => {
     io.emit('PRICE_UPDATED', formatted);
     
     res.json(formatted);
-  } catch (e) { res.json({}); }
+  } catch (e) { 
+    console.error("Lỗi PUT MongoDB:", e);
+    res.status(500).json({ error: "Không thể cập nhật sản phẩm" }); 
+  }
 });
 
 app.delete('/api/products/:id', async (req, res) => {
@@ -90,7 +99,10 @@ app.delete('/api/products/:id', async (req, res) => {
     await Product.findByIdAndDelete(req.params.id);
     io.emit('PRODUCT_DELETED', req.params.id); // 📡 Phát loa: Hàng bị Gỡ!
     res.json({ success: true });
-  } catch (e) { res.json({ success: false }); }
+  } catch (e) { 
+    console.error("Lỗi DELETE MongoDB:", e);
+    res.status(500).json({ error: "Không thể xóa sản phẩm" }); 
+  }
 });
 
 const PORT = 5000;
