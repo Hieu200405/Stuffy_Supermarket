@@ -20,8 +20,17 @@ export default function ProductList() {
   useEffect(() => {
     fetch("https://stuffy-backend-api.onrender.com/api/products")
       .then(res => res.json())
-      .then(data => { setProducts(data); setLoading(false); })
-      .catch(err => { console.error("Lỗi:", err); setLoading(false); });
+      .then(data => {
+        // Bảo vệ: nếu backend trả về { error: "..." } thay vì [] thì không crash
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          console.error("API trả về dữ liệu không hợp lệ (MongoDB chưa kết nối?):", data);
+          setProducts([]);
+        }
+        setLoading(false);
+      })
+      .catch(err => { console.error("Lỗi fetch:", err); setLoading(false); });
 
     socket.on("PRICE_UPDATED", (updatedProduct) => {
       setProducts((current) => current.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)));
