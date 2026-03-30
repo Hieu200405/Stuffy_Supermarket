@@ -57,38 +57,55 @@ Trả lời theo định dạng JSON sau, KHÔNG viết gì thêm ngoài JSON:
 export default function AISearchBar() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [aiResult, setAiResult] = useState(null); // { message, matches }
+  const [aiResult, setAiResult] = useState(null);
   const [focused, setFocused] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const inputRef = useRef(null);
+  const lastCallRef = useRef(0);
+  const cooldownTimer = useRef(null);
 
-  // Lắng nghe sự kiện reset khi người dùng bấm X
   useEffect(() => {
     const handleReset = () => { setQuery(''); setAiResult(null); };
     window.addEventListener('AI_SEARCH_RESET', handleReset);
-    return () => window.removeEventListener('AI_SEARCH_RESET', handleReset);
+    return () => {
+      window.removeEventListener('AI_SEARCH_RESET', handleReset);
+      if (cooldownTimer.current) clearInterval(cooldownTimer.current);
+    };
   }, []);
 
+  const startCooldown = (seconds) => {
+    setCooldown(seconds);
+    cooldownTimer.current = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) { clearInterval(cooldownTimer.current); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   const handleSearch = async (e) => {
-    if (e.key !== 'Enter' || !query.trim()) return;
-    
+    if (e.key !== 'Enter' || !query.trim() || loading || cooldown > 0) return;
+    const now = Date.now();
+    if (now - lastCallRef.current < 5000) {
+      setAiResult({ message: '⏳ Chờ vài giây trước khi tìm kiếm lại nhé!', matches: [] });
+      return;
+    }
     setLoading(true);
     setAiResult(null);
-
+    lastCallRef.current = now;
     try {
-      // Lấy danh sách sản phẩm từ Backend
       const products = await fetch('https://stuffy-backend-api.onrender.com/api/products')
         .then(r => r.json()).catch(() => []);
-
       const result = await callGemini(query, products);
-
       setAiResult(result);
-      
-      // Phát sự kiện cross-MFE để product-app lọc UI
-      window.dispatchEvent(new CustomEvent('AI_SEARCH_RESULT', { 
-        detail: { matches: result.matches, query }
-      }));
+      window.dispatchEvent(new CustomEvent('AI_SEARCH_RESULT', { detail: { matches: result.matches, query } }));
     } catch (err) {
-      setAiResult({ message: `⚠️ Lỗi kết nối AI: ${err.message}. Hãy kiểm tra GEMINI_API_KEY.`, matches: [] });
+      if (err.message.includes('429')) {
+        setAiResult({ message: '☕ AI đang nghỉ ngơi (giới hạn 15 lần/phút của Gemini Free). Thử lại sau 60 giây!', matches: [] });
+        startCooldown(60);
+      } else {
+        setAiResult({ message: `⚠️ Lỗi: ${err.message}`, matches: [] });
+      }
     } finally {
       setLoading(false);
     }
@@ -143,8 +160,12 @@ export default function AISearchBar() {
           onKeyDown={handleSearch}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholder={loading ? 'AI đang phân tích...' : 'Hỏi AI: "Thiết lập bàn làm việc ngầu"...'}
-          disabled={loading}
+          placeholder={
+            cooldown > 0 ? `☕ AI đang nghỉ... thử lại sau ${cooldown}s` :
+            loading ? 'AI đang phân tích...' : 
+            'Hỏi AI: "Thiết lập bàn làm việc ngầu"...'
+          }
+          disabled={loading || cooldown > 0}
           style={{
             width: '100%',
             padding: '13px 45px 13px 48px',
