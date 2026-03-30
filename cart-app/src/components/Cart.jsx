@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useCartStore } from "store/store";
 import Button from "design_system/Button";
 import { io } from "socket.io-client";
+import FortuneWheel from "./FortuneWheel";
 
 const socket = io("https://stuffy-backend-api.onrender.com");
 // Sinh một đoạn PIN ngẫu nhiên 4 chữ số cho phiên giao dịch
@@ -10,8 +11,11 @@ const SESSION_CODE = Math.random().toString(36).substring(2, 6).toUpperCase();
 const Cart = () => {
   const { cartItems, increaseQuantity, decreaseQuantity, removeFromCart, clearCart, addToCart } = useCartStore();
   const [magicItem, setMagicItem] = useState(null);
+  const [showWheel, setShowWheel] = useState(false);
+  const [discount, setDiscount] = useState(null); // { label, discount, emoji, ... }
   
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const rawTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = discount?.discount > 0 ? rawTotal * (1 - discount.discount) : rawTotal;
 
   useEffect(() => {
     // Bước 1: Khai báo với Server "Tui là Desktop, mã PIN của tui là đây"
@@ -100,7 +104,7 @@ const Cart = () => {
           </div>
 
           {/* Cột Phải: Bảng Tóm Tắt Checkout */}
-          <div className="ds-glass-card" style={{ position: 'sticky', top: '120px', background: 'white' }}>
+          <div className="ds-glass-card" style={{ position: 'sticky', top: '120px', background: 'white', overflow: 'hidden' }}>
             <h3 style={{ margin: '0 0 25px 0', fontSize: '1.4rem', fontWeight: '800' }}>Tóm Tắt Đơn Hàng</h3>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', color: 'var(--text-muted)' }}>
@@ -116,13 +120,33 @@ const Cart = () => {
               <span style={{ fontWeight: '800', color: '#16a34a' }}>Miễn phí</span>
             </div>
             
+            {/* Hiển thị nếu đang có Ưu đãi Vòng Quay */}
+            {discount && (
+              <div style={{ background: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: '1px solid #86efac', borderRadius: '12px', padding: '12px 16px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.95rem', fontWeight: '700', color: '#15803d' }}>{discount.emoji} {discount.label}</span>
+                <button onClick={() => setDiscount(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
+              </div>
+            )}
+
             <div style={{ borderTop: '1px dashed var(--border-light)', margin: '20px 0' }}></div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
               <span style={{ fontWeight: '800', fontSize: '1.2rem' }}>Tổng Phải Thu</span>
-              <span style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--primary-color)', letterSpacing: '-1px' }}>${total}</span>
+              <div style={{ textAlign: 'right' }}>
+                {discount?.discount > 0 && (
+                  <div style={{ fontSize: '1rem', fontWeight: '700', color: '#94a3b8', textDecoration: 'line-through' }}>${rawTotal.toFixed(2)}</div>
+                )}
+                <span style={{ fontSize: '2.5rem', fontWeight: '900', color: discount?.discount > 0 ? '#16a34a' : 'var(--primary-color)', letterSpacing: '-1px' }}>${total.toFixed(2)}</span>
+              </div>
             </div>
             
+            {/* Nút Vòng Quay May Mắn */}
+            {!discount && (
+              <button onClick={() => setShowWheel(true)} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '2px dashed #a5b4fc', background: 'linear-gradient(135deg,#eef2ff,#f5f3ff)', color: '#6366f1', fontWeight: '800', cursor: 'pointer', fontSize: '1rem', marginBottom: '12px', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#e0e7ff'} onMouseOut={e => e.currentTarget.style.background = 'linear-gradient(135deg,#eef2ff,#f5f3ff)'}>
+                🎰 Quay vòng quay — nhận ưu đãi!
+              </button>
+            )}
+
             <Button style={{ width: "100%", fontSize: "1.2rem", padding: "18px", borderRadius: '16px' }}>
               Thanh Toán Ngay 🚀
             </Button>
@@ -142,6 +166,15 @@ const Cart = () => {
           </div>
           
         </div>
+      )}
+
+      {/* Modal Vòng Quay May Mắn */}
+      {showWheel && (
+        <FortuneWheel
+          total={rawTotal}
+          onApplyDiscount={(result) => setDiscount(result)}
+          onClose={() => setShowWheel(false)}
+        />
       )}
     </div>
   );
