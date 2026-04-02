@@ -40,12 +40,12 @@ const Cart = () => {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "40px" }}>
         <div>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: '800', margin: '0 0 8px 0', letterSpacing: '-1px' }}>Giỏ hàng của bạn.</h2>
-          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '1.1rem' }}>Đang có {cartItems.length} kiện hàng chờ thanh toán</p>
+          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', margin: '0 0 6px 0', letterSpacing: '-0.5px' }}>Your Cart</h2>
+          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '1rem' }}>{cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}</p>
         </div>
         {cartItems.length > 0 && (
           <button onClick={clearCart} style={{ background: 'transparent', color: '#ef4444', border: '1px solid #fca5a5', padding: '10px 20px', borderRadius: '99px', cursor: 'pointer', fontWeight: '700', transition: 'all 0.2s' }} onMouseOver={e => e.target.style.background = '#fef2f2'} onMouseOut={e => e.target.style.background = 'transparent'}>
-            Xóa Lịch Sử
+            Clear cart
           </button>
         )}
       </div>
@@ -54,13 +54,13 @@ const Cart = () => {
         <div style={{ display: 'flex', gap: '30px', alignItems: 'stretch' }}>
           <div className="ds-glass-card" style={{ flex: 1, textAlign: 'center', padding: '80px 20px', background: '#f8fafc', border: '2px dashed var(--border-light)' }}>
             <div style={{ fontSize: '5rem', opacity: 0.1, marginBottom: '20px' }}>🛒</div>
-            <h3 style={{ fontSize: '1.6rem', color: 'var(--text-main)', marginBottom: '10px', fontWeight: '800' }}>Giỏ hàng siêu trống rỗng!</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Hãy về lại Danh sách Cửa Hàng và bổ sung kho vũ khí ngay.</p>
+            <h3 style={{ fontSize: '1.4rem', color: 'var(--text-main)', marginBottom: '8px', fontWeight: '700' }}>Your cart is empty</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>Browse the product catalogue to add items.</p>
           </div>
           
           <div className="ds-glass-card" style={{ width: '380px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: 'white', textAlign: 'center', boxShadow: 'var(--shadow-lg)' }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.3rem', fontWeight: '800' }}>Scan & Go 📱</h3>
-            <p style={{ margin: '0 0 20px 0', fontSize: '0.9rem', opacity: 0.8 }}>Mở Camera điện thoại, quét mã này để biến điện thoại thành máy quét siêu thị.</p>
+            <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: '700' }}>Scan & Go</h3>
+            <p style={{ margin: '0 0 20px 0', fontSize: '0.88rem', opacity: 0.75, lineHeight: 1.5 }}>Scan this QR code with your phone to add products remotely.</p>
             <div style={{ padding: '10px', background: 'white', borderRadius: '12px' }}>
               <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://localhost:3000/scanner/${SESSION_CODE}`} alt="QR Code" style={{ width: '100%', display: 'block' }} />
             </div>
@@ -105,19 +105,19 @@ const Cart = () => {
 
           {/* Cột Phải: Bảng Tóm Tắt Checkout */}
           <div className="ds-glass-card" style={{ position: 'sticky', top: '120px', background: 'white', overflow: 'hidden' }}>
-            <h3 style={{ margin: '0 0 25px 0', fontSize: '1.4rem', fontWeight: '800' }}>Tóm Tắt Đơn Hàng</h3>
+            <h3 style={{ margin: '0 0 25px 0', fontSize: '1.2rem', fontWeight: '700' }}>Order Summary</h3>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', color: 'var(--text-muted)' }}>
-              <span style={{ fontSize: '1.05rem' }}>Tạm tính ({cartItems.length} món)</span>
-              <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>${total}</span>
+              <span style={{ fontSize: '1rem' }}>Subtotal ({cartItems.length} items)</span>
+              <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>${rawTotal.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', color: 'var(--text-muted)' }}>
-              <span style={{ fontSize: '1.05rem' }}>Thuế VAT (0%)</span>
-              <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>$0</span>
+              <span style={{ fontSize: '1rem' }}>Tax (0%)</span>
+              <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>$0.00</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '25px', color: 'var(--text-muted)' }}>
-              <span style={{ fontSize: '1.05rem' }}>Phí vận chuyển</span>
-              <span style={{ fontWeight: '800', color: '#16a34a' }}>Miễn phí</span>
+              <span style={{ fontSize: '1rem' }}>Shipping</span>
+              <span style={{ fontWeight: '700', color: '#16a34a' }}>Free</span>
             </div>
             
             {/* Hiển thị nếu đang có Ưu đãi Vòng Quay */}
@@ -131,7 +131,7 @@ const Cart = () => {
             <div style={{ borderTop: '1px dashed var(--border-light)', margin: '20px 0' }}></div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-              <span style={{ fontWeight: '800', fontSize: '1.2rem' }}>Tổng Phải Thu</span>
+              <span style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-muted)' }}>Total</span>
               <div style={{ textAlign: 'right' }}>
                 {discount?.discount > 0 && (
                   <div style={{ fontSize: '1rem', fontWeight: '700', color: '#94a3b8', textDecoration: 'line-through' }}>${rawTotal.toFixed(2)}</div>
@@ -143,24 +143,24 @@ const Cart = () => {
             {/* Nút Vòng Quay May Mắn */}
             {!discount && (
               <button onClick={() => setShowWheel(true)} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '2px dashed #a5b4fc', background: 'linear-gradient(135deg,#eef2ff,#f5f3ff)', color: '#6366f1', fontWeight: '800', cursor: 'pointer', fontSize: '1rem', marginBottom: '12px', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#e0e7ff'} onMouseOut={e => e.currentTarget.style.background = 'linear-gradient(135deg,#eef2ff,#f5f3ff)'}>
-                🎰 Quay vòng quay — nhận ưu đãi!
+              Spin for a discount
               </button>
             )}
 
-            <Button style={{ width: "100%", fontSize: "1.2rem", padding: "18px", borderRadius: '16px' }}>
-              Thanh Toán Ngay 🚀
+            <Button style={{ width: "100%", fontSize: "1.1rem", padding: "18px", borderRadius: '16px' }}>
+              Proceed to Checkout
             </Button>
             
-            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', margin: '20px 0 0 0' }}>
-              🔒 Thanh toán an toàn 100% bằng Apple Pay / Stripe.
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem', margin: '16px 0 0 0' }}>
+              Secured by Apple Pay / Stripe.
             </p>
 
             {/* QR Code thu nhỏ vẫn duy trì để khách ném thêm đồ */}
             <div style={{ marginTop: '25px', padding: '15px', background: '#f8fafc', borderRadius: '12px', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '15px' }}>
               <img src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=http://localhost:3000/scanner/${SESSION_CODE}`} alt="QR Code Mini" style={{ width: '60px', height: '60px', borderRadius: '8px' }} />
               <div>
-                <p style={{ margin: '0 0 5px 0', fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main)' }}>Scan & Go 📱</p>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>Mã PIN: <strong style={{color: 'var(--primary-color)'}}>{SESSION_CODE}</strong></p>
+                <p style={{ margin: '0 0 3px 0', fontSize: '0.88rem', fontWeight: '700', color: 'var(--text-main)' }}>Scan & Go</p>
+                <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>Session PIN: <strong style={{color: 'var(--primary-color)', letterSpacing: '1px'}}>{SESSION_CODE}</strong></p>
               </div>
             </div>
           </div>

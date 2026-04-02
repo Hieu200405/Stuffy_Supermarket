@@ -26,11 +26,11 @@ export default class ErrorBoundary extends React.Component {
           margin: '10px 0',
           boxShadow: '0 0 20px rgba(239, 68, 68, 0.2)'
         }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>🚧</span> Khu Vực Đang Bảo Trì Khẩn Cấp
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            Something went wrong
           </h3>
-          <p style={{ margin: '0 0 20px 0', color: '#f8fafc' }}>
-            Hệ thống Micro Frontend này đã gặp sự cố và tự động đóng băng để tránh lan truyền cháy sang Server khác. Các khu vực khác trong siêu thị vẫn bán hàng bình thường!
+          <p style={{ margin: '0 0 20px 0', color: '#b91c1c', fontSize: '0.9rem', lineHeight: 1.5 }}>
+            This module encountered an error and has been isolated. Other parts of the application continue to work normally.
           </p>
           <button 
             onClick={() => this.setState({ hasError: false })} 
@@ -45,7 +45,7 @@ export default class ErrorBoundary extends React.Component {
               boxShadow: '0 4px 10px rgba(239, 68, 68, 0.4)'
             }}
           >
-            🔄 Kết nối lại Module
+            Retry
           </button>
         </div>
       );

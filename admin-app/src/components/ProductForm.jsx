@@ -43,21 +43,21 @@ const ProductForm = ({ onAdd, onUpdate, editing }) => {
   return (
     <div className="ds-glass-card" style={{ position: 'sticky', top: '120px' }}>
       <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', fontWeight: '800' }}>
-        {editing ? 'Sửa thông số Mã Hàng' : 'Nhập Hàng Mới Lên Kệ'}
+        {editing ? 'Edit Product' : 'Add New Product'}
       </h3>
       
       <form onSubmit={handleSubmit}>
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-muted)' }}>Tên Sản Phẩm</label>
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.88rem', fontWeight: '600', color: 'var(--text-muted)' }}>Product Name</label>
         <input
-          placeholder="VD: Chuột Gaming RGB"
+          placeholder="e.g. Sony WH-1000XM5"
           value={name}
           onChange={e => setName(e.target.value)}
           style={inputStyle}
         />
         
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-muted)' }}>Giá Khuyến Mãi (USD)</label>
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.88rem', fontWeight: '600', color: 'var(--text-muted)' }}>Price (USD)</label>
         <input
-          placeholder="VD: 45"
+          placeholder="e.g. 349"
           value={price}
           type="number"
           onChange={e => setPrice(e.target.value)}
@@ -65,7 +65,7 @@ const ProductForm = ({ onAdd, onUpdate, editing }) => {
         />
 
         <button type="submit" className="ds-button" style={{ width: '100%', marginTop: '10px' }}>
-          {editing ? "Lưu Cập Nhật Giá ⚡" : "Thêm Hàng Lên Kệ"}
+          {editing ? 'Save Changes' : 'Add Product'}
         </button>
       </form>
     </div>

@@ -52,8 +52,8 @@ const App = () => {
   return (
     <div>
       <div style={{ marginBottom: "30px", borderBottom: '1px solid var(--border-light)', paddingBottom: '20px' }}>
-        <h1 style={{ color: "var(--text-main)", margin: "0 0 10px 0", fontSize: '2.2rem', fontWeight: '800' }}>Trung Tâm Điều Khiển Nhịp Đập</h1>
-        <p style={{ margin: 0, color: 'var(--text-muted)' }}>Mọi thay đổi giá sẽ được truyền Sóng Real-time thẳng xuống máy khách.</p>
+        <h1 style={{ color: "var(--text-main)", margin: "0 0 6px 0", fontSize: '1.8rem', fontWeight: '800' }}>Product Management</h1>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.92rem' }}>Changes to pricing and inventory are broadcast in real-time to all connected clients.</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 350px) 1fr', gap: '30px', alignItems: 'start' }}>
