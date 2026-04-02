@@ -3,11 +3,13 @@ import React, { useState, useEffect } from "react";
 const ProductForm = ({ onAdd, onUpdate, editing }) => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     if (editing) {
       setName(editing.name);
       setPrice(editing.price);
+      setDescription(editing.description || "");
     }
   }, [editing]);
 
@@ -20,12 +22,14 @@ const ProductForm = ({ onAdd, onUpdate, editing }) => {
       id: editing ? editing.id : null,
       name,
       price: Number(price),
+      description,
     };
 
     editing ? onUpdate(product) : onAdd(product);
 
     setName("");
     setPrice("");
+    setDescription("");
   };
 
   const inputStyle = {
@@ -62,6 +66,14 @@ const ProductForm = ({ onAdd, onUpdate, editing }) => {
           type="number"
           onChange={e => setPrice(e.target.value)}
           style={inputStyle}
+        />
+
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.88rem', fontWeight: '600', color: 'var(--text-muted)' }}>Description</label>
+        <textarea
+          placeholder="Product details..."
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
         />
 
         <button type="submit" className="ds-button" style={{ width: '100%', marginTop: '10px' }}>
