@@ -1,14 +1,14 @@
 import React, { useState, useRef } from "react";
 
 const SEGMENTS = [
-  { label: "Giảm 5%",   discount: 0.05, color: "#6366f1", emoji: "✨" },
-  { label: "Thêm 1 sp", discount: 0,    color: "#f59e0b", emoji: "🎁", freeItem: true },
-  { label: "Giảm 10%",  discount: 0.10, color: "#10b981", emoji: "💚" },
-  { label: "Chúc mừng", discount: 0,    color: "#ec4899", emoji: "😢", miss: true },
-  { label: "Giảm 20%",  discount: 0.20, color: "#ef4444", emoji: "🔥" },
-  { label: "Giảm 15%",  discount: 0.15, color: "#8b5cf6", emoji: "💜" },
-  { label: "Miễn Ship", discount: 0,    color: "#0ea5e9", emoji: "🚀", freeShip: true },
-  { label: "Chúc mừng", discount: 0,    color: "#94a3b8", emoji: "😅", miss: true },
+  { label: "5% Off",      discount: 0.05, color: "#6366f1", emoji: "✨" },
+  { label: "Free Item",   discount: 0,    color: "#f59e0b", emoji: "🎁", freeItem: true },
+  { label: "10% Off",     discount: 0.10, color: "#10b981", emoji: "💚" },
+  { label: "No luck",     discount: 0,    color: "#ec4899", emoji: "😢", miss: true },
+  { label: "20% Off",     discount: 0.20, color: "#ef4444", emoji: "🔥" },
+  { label: "15% Off",     discount: 0.15, color: "#8b5cf6", emoji: "💜" },
+  { label: "Free Ship",   discount: 0,    color: "#0ea5e9", emoji: "🚀", freeShip: true },
+  { label: "No luck",     discount: 0,    color: "#94a3b8", emoji: "😅", miss: true },
 ];
 
 const SIZE = 320;
@@ -108,10 +108,10 @@ export default function FortuneWheel({ total, onApplyDiscount, onClose }) {
 
         <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>🎰</div>
         <h2 style={{ margin: "0 0 4px 0", fontSize: "1.8rem", fontWeight: "900", letterSpacing: "-0.5px" }}>
-          Vòng Quay May Mắn
+          Spin & Win
         </h2>
         <p style={{ color: "#64748b", margin: "0 0 28px 0", fontSize: "0.95rem" }}>
-          Quay một lần miễn phí cho đơn hàng <strong style={{ color: "#6366f1" }}>${total}</strong> của bạn!
+          One free spin for your <strong style={{ color: "#6366f1" }}>${total}</strong> order!
         </p>
 
         {/* Vòng quay SVG */}
@@ -173,14 +173,14 @@ export default function FortuneWheel({ total, onApplyDiscount, onClose }) {
           }}>
             <div style={{ fontSize: "2rem", marginBottom: "4px" }}>{result.emoji}</div>
             <p style={{ margin: 0, fontWeight: "900", fontSize: "1.3rem", color: result.miss ? "#94a3b8" : "#15803d" }}>
-              {result.miss ? "Chúc bạn may mắn lần sau!" : `Bạn được ${result.label}!`}
+              {result.miss ? "Better luck next time!" : `You got ${result.label}!`}
             </p>
             {!result.miss && (
               <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: "0.9rem" }}>
                 {result.discount > 0
-                  ? `Tiết kiệm được $${(total * result.discount).toFixed(2)} - Tổng còn lại $${(total * (1 - result.discount)).toFixed(2)}`
-                  : result.freeShip ? "Giao hàng miễn phí cho đơn hàng này!"
-                  : "Một sản phẩm ngẫu nhiên sẽ được miễn phí!"}
+                  ? `You save $${(total * result.discount).toFixed(2)} — new total $${(total * (1 - result.discount)).toFixed(2)}`
+                  : result.freeShip ? "Free shipping applied to this order!"
+                  : "A random item will be added to your cart for free!"}
               </p>
             )}
           </div>
@@ -200,7 +200,7 @@ export default function FortuneWheel({ total, onApplyDiscount, onClose }) {
           onMouseOver={e => { if (!spinning) e.currentTarget.style.transform = "translateY(-2px)"; }}
           onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            {spinning ? "🌀 Đang quay..." : "🎰 QUAY NGAY — MIỄN PHÍ!"}
+            {spinning ? "Spinning..." : "SPIN NOW — FREE!"}
           </button>
         ) : result.miss ? (
           <button onClick={onClose} style={{
@@ -208,14 +208,14 @@ export default function FortuneWheel({ total, onApplyDiscount, onClose }) {
             background: "#f1f5f9", color: "#64748b",
             fontSize: "1.1rem", fontWeight: "700", cursor: "pointer",
           }}>
-            Đóng lại 😅
+            Close
           </button>
         ) : (
           <div style={{ display: "flex", gap: "12px" }}>
             <button onClick={onClose} style={{
               flex: 1, padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0",
               background: "white", color: "#64748b", fontWeight: "700", cursor: "pointer",
-            }}>Bỏ qua</button>
+            }}>Skip</button>
             <button onClick={handleApply} style={{
               flex: 2, padding: "14px", borderRadius: "12px", border: "none",
               background: "linear-gradient(135deg, #10b981, #059669)",
@@ -223,7 +223,7 @@ export default function FortuneWheel({ total, onApplyDiscount, onClose }) {
               fontSize: "1.05rem",
               boxShadow: "0 6px 20px rgba(16,185,129,0.35)",
             }}>
-              ✅ Áp dụng ưu đãi ngay!
+              Apply discount
             </button>
           </div>
         )}

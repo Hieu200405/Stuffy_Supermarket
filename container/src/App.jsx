@@ -59,10 +59,10 @@ export default function App() {
                   <span style={{ background: 'rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>Socket.IO · MongoDB · Docker</span>
                 </div>
               </div>
-                <ProtectedModule moduleName="Quầy Hàng"><ProductList /></ProtectedModule>
+                <ProtectedModule moduleName="Products"><ProductList /></ProtectedModule>
               </>
             } />
-            <Route path="/cart" element={<ProtectedModule moduleName="Thu Ngân"><Cart /></ProtectedModule>} />
+            <Route path="/cart" element={<ProtectedModule moduleName="Cart"><Cart /></ProtectedModule>} />
             <Route path="/admin" element={<ProtectedModule moduleName="Admin"><Admin /></ProtectedModule>} />
             <Route path="/scanner/:sessionCode" element={<MobileScanner />} />
           </Routes>

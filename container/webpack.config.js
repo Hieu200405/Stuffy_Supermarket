@@ -1,9 +1,9 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = require("webpack").container;
 const webpack = require("webpack");
-require("dotenv").config(); // Nạp đạn Biến Môi Trường
+require("dotenv").config();
 
-// Động cơ tự động gài số: Nếu chạy máy tính thì lấy file .env (Localhost), nếu đẩy lên mạng (Render) thì tự lấy đường link của Render
+// Auto-detect environment: use .env for local dev, fall back to process.env for Render deployment
 const getUrl = (envVar, defaultUrl) => process.env[envVar] || defaultUrl;
 
 module.exports = {
