@@ -14,7 +14,7 @@ export default function ProductList() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [flashingId, setFlashingId] = useState(null);
-  const [active3DColor, setActive3DColor] = useState(null);
+  const [active3DProduct, setActive3DProduct] = useState(null); // { color, image, name }
   const [aiMatches, setAiMatches] = useState(null); // null = no filter, [] = no match, [...] = matched
 
   useEffect(() => {
@@ -117,9 +117,8 @@ export default function ProductList() {
               
               <button 
                 onClick={() => {
-                  // Pick a color variation based on product ID
                   const colorMatch = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#ec4899'][p.id.charCodeAt(p.id.length-1) % 5];
-                  setActive3DColor(colorMatch);
+                  setActive3DProduct({ color: colorMatch, image: p.image, name: p.name });
                 }} 
                 style={{ marginTop: '15px', width: '100%', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', background: '#f8fafc', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s', color: 'var(--text-main)' }}
                 onMouseOver={e => { e.target.style.background = 'var(--primary-color)'; e.target.style.color = 'white'; }}
@@ -145,13 +144,13 @@ export default function ProductList() {
       </div>
       
       {/* 🔮 CỔNG DỊCH CHUYỂN 3D AR MFE (Dịch chuyển Component 3MB từ Cổng 3007 tàng hình vào đây) */}
-      {active3DColor && (
+      {active3DProduct && (
         <Suspense fallback={
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(10px)', zIndex: 99999, display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontWeight: 'bold' }}>
             <span style={{ fontSize: '1rem', color: 'white', fontWeight: '600' }}>Loading 3D Engine...</span>
           </div>
         }>
-          <Viewer3D color={active3DColor} onClose={() => setActive3DColor(null)} />
+          <Viewer3D color={active3DProduct.color} image={active3DProduct.image} name={active3DProduct.name} onClose={() => setActive3DProduct(null)} />
         </Suspense>
       )}
 

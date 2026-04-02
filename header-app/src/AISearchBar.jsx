@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const AI_ENABLED = GEMINI_API_KEY.length > 10; // Only active when key is properly configured
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const PRODUCT_CONTEXT = `
@@ -83,6 +84,10 @@ export default function AISearchBar() {
 
   const handleSearch = async (e) => {
     if (e.key !== 'Enter' || !query.trim() || loading || cooldown > 0) return;
+    if (!AI_ENABLED) {
+      setAiResult({ message: 'AI search is not configured. Set GEMINI_API_KEY in environment variables.', matches: [] });
+      return;
+    }
     const now = Date.now();
     if (now - lastCallRef.current < 5000) {
       setAiResult({ message: 'Please wait a few seconds before searching again.', matches: [] });
