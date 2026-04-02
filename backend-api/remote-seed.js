@@ -13,37 +13,37 @@ async function seedRemote() {
   const baseURL = 'https://stuffy-backend-api.onrender.com/api/products';
   
   try {
-    console.log("✈️ Đang điều động phi cơ kết nối vào Backend (Render)...");
+    console.log('[RemoteSeed] Connecting to remote API:', baseURL);
     const res = await fetch(baseURL);
     const currentProducts = await res.json();
     
     if (!Array.isArray(currentProducts)) {
-      console.error("❌ Máy chủ Render từ chối hoặc máy chủ chết lâm sàng. Phản hồi:", currentProducts);
-      console.error("💡 Khả năng cao Server Render vẫn chưa nhận diện được MONGO_URI MongoDB Atlas. Bạn nhớ cài MONGO_URI lên Render rồi chờ nó xanh (Deploy Success) nhé!");
+      console.error('[RemoteSeed] Unexpected API response (expected array). Backend may not be connected to MongoDB Atlas:', currentProducts);
+      console.error('[RemoteSeed] Ensure MONGO_URI is set in Render environment variables and the service has redeployed.');
       return;
     }
     
-    console.log(`🧹 Đã quét thấy ${currentProducts.length} mặt hàng giả lưu trong kho. Tiến hành vứt rác...`);
+    console.log(`[RemoteSeed] Found ${currentProducts.length} existing products. Clearing...`);
     for (const p of currentProducts) {
       if (p.id) {
          await fetch(`${baseURL}/${p.id}`, { method: 'DELETE' });
-         console.log(`Đã xóa phế phẩm: ${p.id}`);
+         console.log(`[RemoteSeed] Deleted product: ${p.id}`);
       }
     }
     
-    console.log("💎 Máy chủ bay đã bay vào quỹ đạo. Bắt đầu Dội Bom Máy Ảnh & Máy Tính Xuống Siêu Thị!");
+    console.log('[RemoteSeed] Inserting new products...');
     for (const newP of vipProducts) {
       await fetch(baseURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newP)
       });
-      console.log(`📦 Bơm hàng thành công: ${newP.name}`);
+      console.log(`[RemoteSeed] Inserted: ${newP.name}`);
     }
     
-    console.log("✅ HOÀN TẤT CHIẾN DỊCH TÂN TRANG HÀNG HÓA! BẠN CÓ THỂ MỞ APP NGAY LẬP TỨC.");
+    console.log('[RemoteSeed] Done. All products have been seeded successfully.');
   } catch (error) {
-    console.error("Lỗi:", error);
+    console.error('[RemoteSeed] Seed operation failed:', error.message);
   }
 }
 

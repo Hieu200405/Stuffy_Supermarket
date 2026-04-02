@@ -15,17 +15,17 @@ const io = new Server(server, { cors: { origin: '*' } });
 
 // Đài phát thanh xác nhận người nghe
 io.on('connection', (socket) => {
-  console.log('⚡ Một Khách hàng siêu thị vừa kết nối Live Sync:', socket.id);
+  console.log(`[Socket.IO] Client connected: ${socket.id}`);
 
   // Nhận mã PIN từ Màn hình Desktop cắm tại siêu thị
   socket.on('JOIN_CART_SESSION', (sessionCode) => {
     socket.join(sessionCode);
-    console.log(`🖥️ Màn hình Desktop vừa mở Tần số giỏ hàng khẩn cấp: ${sessionCode}`);
+    console.log(`[Socket.IO] Desktop joined cart session: ${sessionCode}`);
   });
 
   // Khi Điện thoại khách hàng Quét Món đồ và bắn sóng lên Server
   socket.on('MOBILE_SCAN_ITEM', ({ sessionCode, product }) => {
-    console.log(`📱 Bíp! Điện thoại vừa gắp ${product.name} ném thẳng vào Giỏ màn hình ${sessionCode}!`);
+    console.log(`[Socket.IO] Mobile scanned "${product.name}" -> session ${sessionCode}`);
     // Dội sóng thẳng xuống đích danh Màn hình Desktop Đủ mã PIN
     io.to(sessionCode).emit('DESKTOP_RECEIVE_ITEM', product);
   });
@@ -35,7 +35,7 @@ const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/stuffy_db';
 
 mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 })
   .then(async () => {
-    console.log('🟢 Cáp quang MongoDB: Kết nối thần tốc!');
+    console.log('[MongoDB] Connection established successfully.');
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany([
@@ -51,9 +51,7 @@ mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 })
     }
   })
   .catch(err => {
-    console.log('--- CHÚ Ý ---');
-    console.log('Máy bạn đang chưa cài đặt MongoDB (Docker thất bại do Disk hoặc Network lúc nãy).');
-    console.log('Để trải nghiệm Socket, API đã được Bypass cho phép chạy Socket trên mảng tạm.');
+    console.error('[MongoDB] Connection failed. MONGO_URI may be missing or unreachable:', err.message);
   });
 
 app.get('/api/products', async (req, res) => {
@@ -61,8 +59,8 @@ app.get('/api/products', async (req, res) => {
     const products = await Product.find();
     res.json(products.map(p => ({ id: p._id.toString(), name: p.name, price: p.price, image: p.image })));
   } catch (e) { 
-    console.error("Lỗi GET MongoDB:", e);
-    res.status(500).json({ error: "Lỗi kết nối cơ sở dữ liệu MongoDB Atlas" }); 
+    console.error('[GET /api/products] Database query failed:', e.message);
+    res.status(500).json({ error: 'Internal server error: failed to retrieve products' }); 
   }
 });
 
@@ -71,11 +69,11 @@ app.post('/api/products', async (req, res) => {
     const newProduct = new Product(req.body);
     await newProduct.save();
     const formatted = { id: newProduct._id.toString(), ...newProduct._doc };
-    io.emit('NEW_PRODUCT', formatted); // 📡 Phát loa toàn phường: Hàng mới về!
+    io.emit('NEW_PRODUCT', formatted);
     res.json(formatted);
   } catch (e) { 
-    console.error("Lỗi POST MongoDB:", e);
-    res.status(500).json({ error: "Không thể lưu sản phẩm" }); 
+    console.error('[POST /api/products] Failed to create product:', e.message);
+    res.status(500).json({ error: 'Internal server error: failed to create product' }); 
   }
 });
 
@@ -84,27 +82,24 @@ app.put('/api/products/:id', async (req, res) => {
     const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     const formatted = { id: updated._id.toString(), ...updated._doc };
     
-    // 📡 TRỌNG TÂM: Phát sóng Real-time "GIÁ THAY ĐỔI" ra mọi thiết bị của Khách Hàng
     io.emit('PRICE_UPDATED', formatted);
-    
     res.json(formatted);
   } catch (e) { 
-    console.error("Lỗi PUT MongoDB:", e);
-    res.status(500).json({ error: "Không thể cập nhật sản phẩm" }); 
+    console.error(`[PUT /api/products/${'{req.params.id}'}] Failed to update product:`, e.message);
+    res.status(500).json({ error: 'Internal server error: failed to update product' }); 
   }
 });
 
 app.delete('/api/products/:id', async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
-    io.emit('PRODUCT_DELETED', req.params.id); // 📡 Phát loa: Hàng bị Gỡ!
+    io.emit('PRODUCT_DELETED', req.params.id);
     res.json({ success: true });
   } catch (e) { 
-    console.error("Lỗi DELETE MongoDB:", e);
-    res.status(500).json({ error: "Không thể xóa sản phẩm" }); 
+    console.error(`[DELETE /api/products/${'{req.params.id}'}] Failed to delete product:`, e.message);
+    res.status(500).json({ error: 'Internal server error: failed to delete product' }); 
   }
 });
 
-const PORT = 5000;
-// Bật server http + socket thay vì bật app express chay
-server.listen(PORT, () => console.log(`🚀 Pháo đài Socket.io + Express nổ máy tại cổng ${PORT}`));
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`[Server] Express + Socket.IO listening on port ${PORT}`));

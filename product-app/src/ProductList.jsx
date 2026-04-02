@@ -25,12 +25,12 @@ export default function ProductList() {
         if (Array.isArray(data)) {
           setProducts(data);
         } else {
-          console.error("API trả về dữ liệu không hợp lệ (MongoDB chưa kết nối?):", data);
+          console.warn('[ProductList] API returned non-array response. MongoDB may be unavailable:', data);
           setProducts([]);
         }
         setLoading(false);
       })
-      .catch(err => { console.error("Lỗi fetch:", err); setLoading(false); });
+      .catch(err => { console.error('[ProductList] Failed to fetch products:', err.message); setLoading(false); });
 
     socket.on("PRICE_UPDATED", (updatedProduct) => {
       setProducts((current) => current.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)));
