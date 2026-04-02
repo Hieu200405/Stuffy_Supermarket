@@ -112,8 +112,9 @@ export default function ProductList() {
                 <img src={p.image} alt={p.name} style={{ width: "160px", height: "160px", objectFit: 'contain', mixBlendMode: 'multiply' }} />
               </div>
               
-              <h4 style={{ margin: "0 0 8px 0", fontSize: "1.3rem", fontWeight: '700', color: 'var(--text-main)' }}>{p.name}</h4>
-              <p style={{ margin: "0 0 0 0", color: "var(--text-muted)", fontSize: "0.9rem" }}>SKU: #{p.id.substring(0, 6)}</p>
+              <h4 style={{ margin: "0 0 8px 0", fontSize: "1.3rem", fontWeight: '700', color: 'var(--text-main)', minHeight: '50px' }}>{p.name}</h4>
+              <p style={{ margin: "0 0 8px 0", color: "var(--text-muted)", fontSize: "0.9rem" }}>SKU: #{p.id.substring(0, 6)}</p>
+              <p style={{ margin: "0 0 16px 0", color: "#64748b", fontSize: "0.95rem", lineHeight: "1.5", display: "-webkit-box", WebkitLineClamp: "3", WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "65px" }}>{p.description || "No description available."}</p>
               
               <button 
                 onClick={() => {

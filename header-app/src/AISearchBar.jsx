@@ -4,19 +4,10 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const AI_ENABLED = GEMINI_API_KEY.length > 10; // Only active when key is properly configured
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-const PRODUCT_CONTEXT = `
-1. MacBook Pro M3 Max - high-end laptop, programming, design, graphics
-2. Apple Vision Pro - mixed reality headset, AR/VR, 3D, media
-3. Sony WH-1000XM5 - noise-cancelling headphones, music, podcasts
-4. PlayStation 5 - gaming console, entertainment
-5. Keychron Q1 Pro - mechanical keyboard, programming, office
-6. Logitech MX Master 3S - ergonomic mouse, design, office
-7. GoPro Hero 12 - action camera, travel, vlogging, outdoor
-8. Marshall Stanmore III - bluetooth speaker, music, home audio
-`;
+
 
 async function callGemini(userQuery, products) {
-  const productList = products.map(p => `- ${p.name} ($${p.price})`).join('\n');
+  const productList = products.map(p => `- ${p.name} ($${p.price}): ${p.description || 'No description'}`).join('\n');
   
   const prompt = `You are a smart shopping assistant for Stuffy Store, a tech retail platform.
 The customer is looking for: "${userQuery}"
