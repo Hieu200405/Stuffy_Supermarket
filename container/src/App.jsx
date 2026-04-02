@@ -13,7 +13,7 @@ const ProtectedModule = ({ children, moduleName }) => (
   <ErrorBoundary>
     <Suspense fallback={
       <div style={{ padding: '40px', display: 'flex', justifyContent: 'center', opacity: 0.5 }}>
-        <h3 style={{ fontWeight: '600' }}>Đang đồng bộ hạt nhân {moduleName}...</h3>
+        <h3 style={{ fontWeight: '600', color: 'var(--text-muted)' }}>Loading {moduleName}...</h3>
       </div>
     }>
       {children}
@@ -25,13 +25,13 @@ const Navbar = () => {
   return (
     <nav style={{ display: 'flex', justifyContent: 'center', gap: '40px', padding: '20px 0 0 0', borderBottom: '1px solid var(--border-light)', background: 'white' }}>
       <NavLink to="/" end style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? 'var(--primary-color)' : 'var(--text-muted)', borderBottom: isActive ? '3px solid var(--primary-color)' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
-        🛍 Khám Phá
+        Products
       </NavLink>
       <NavLink to="/cart" style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? 'var(--primary-color)' : 'var(--text-muted)', borderBottom: isActive ? '3px solid var(--primary-color)' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
-        🛒 Giỏ Hàng & Thanh Toán
+        Cart
       </NavLink>
       <NavLink to="/admin" style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? '#ef4444' : 'var(--text-muted)', borderBottom: isActive ? '3px solid #ef4444' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
-        ⚙️ Quản Trị Hệ Thống
+        Admin
       </NavLink>
     </nav>
   );
@@ -48,14 +48,17 @@ export default function App() {
           <Routes>
             <Route path="/" element={
               <>
-                <div style={{ background: 'var(--primary-color)', color: 'white', padding: '50px 60px', borderRadius: 'var(--radius-lg)', marginBottom: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: 'var(--shadow-hover)' }}>
-                  <div>
-                    <span className="ds-badge" style={{ background: 'var(--secondary-color)', color: 'white', marginBottom: '15px', display: 'inline-block' }}>Thế hệ mới 2.0</span>
-                    <h2 style={{ fontSize: '3rem', margin: '0 0 15px 0', fontWeight: '800', lineHeight: 1.1 }}>Công nghệ Bán Lẻ <br/><span style={{ color: 'var(--accent-color)' }}>Tương Lai.</span></h2>
-                    <p style={{ margin: 0, opacity: 0.8, fontSize: '1.2rem', maxWidth: '500px', lineHeight: 1.5 }}>Trải nghiệm Hệ sinh thái Micro Frontend với tốc độ đồng bộ Dữ Liệu Thời Gian Thực chớp nhoáng.</p>
-                  </div>
-                  <div style={{ fontSize: '6rem', textShadow: '0 20px 30px rgba(0,0,0,0.5)' }}>🛍️</div>
+                <div style={{ background: 'var(--primary-color)', color: 'white', padding: '40px 60px', borderRadius: 'var(--radius-lg)', marginBottom: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: 'var(--shadow-hover)' }}>
+                <div>
+                  <span className="ds-badge" style={{ background: 'rgba(255,255,255,0.15)', color: 'white', marginBottom: '12px', display: 'inline-block', fontSize: '0.8rem', letterSpacing: '0.5px' }}>Live · Real-time Sync</span>
+                  <h2 style={{ fontSize: '2.6rem', margin: '0 0 12px 0', fontWeight: '800', lineHeight: 1.15 }}>Stuffy<span style={{ color: 'var(--accent-color)' }}> Store</span></h2>
+                  <p style={{ margin: 0, opacity: 0.75, fontSize: '1.05rem', maxWidth: '460px', lineHeight: 1.6 }}>A modern commerce platform built on Micro Frontends architecture with real-time data synchronization.</p>
                 </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
+                  <span style={{ background: 'rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>8 MFE Modules</span>
+                  <span style={{ background: 'rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>Socket.IO · MongoDB · Docker</span>
+                </div>
+              </div>
                 <ProtectedModule moduleName="Quầy Hàng"><ProductList /></ProtectedModule>
               </>
             } />

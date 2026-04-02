@@ -6,15 +6,15 @@ const ProductList = ({ products, onDelete, onEdit }) => {
       
       {/* Table Header */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(150px, 1fr) 100px 150px', gap: '15px', padding: '15px 20px', background: '#f8fafc', borderBottom: '1px solid var(--border-light)', fontWeight: '700', color: 'var(--text-muted)' }}>
-        <div>Sản Phẩm</div>
-        <div>Mức Giá</div>
-        <div style={{ textAlign: 'right' }}>Hành Động</div>
+        <div>Product</div>
+        <div>Price</div>
+        <div style={{ textAlign: 'right' }}>Actions</div>
       </div>
 
       {/* Table Body */}
       <div>
         {products.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Kho đang trống, mời bạn nạp hàng bên cạnh.</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.93rem' }}>No products found. Add one to get started.</div>
         ) : (
           products.map(p => (
             <div key={p.id} style={{ display: 'grid', gridTemplateColumns: 'minmax(150px, 1fr) 100px 150px', gap: '15px', padding: '15px 20px', borderBottom: '1px solid var(--border-light)', alignItems: 'center' }}>
@@ -34,7 +34,7 @@ const ProductList = ({ products, onDelete, onEdit }) => {
                   onMouseOver={e => e.target.style.background = '#e2e8f0'}
                   onMouseOut={e => e.target.style.background = '#f1f5f9'}
                 >
-                  Sửa
+                   Edit
                 </button>
                 <button 
                   onClick={() => onDelete(p.id)} 
@@ -42,7 +42,7 @@ const ProductList = ({ products, onDelete, onEdit }) => {
                   onMouseOver={e => e.target.style.background = '#fee2e2'}
                   onMouseOut={e => e.target.style.background = '#fef2f2'}
                 >
-                  Xóa
+                  Delete
                 </button>
               </div>
               

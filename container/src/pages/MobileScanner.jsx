@@ -34,12 +34,12 @@ export default function MobileScanner() {
   return (
     <div style={{ maxWidth: '400px', margin: '0 auto', background: '#0f172a', minHeight: '100vh', padding: '20px', color: 'white', borderRadius: '30px' }}>
       <div style={{ textAlign: 'center', marginBottom: '30px', marginTop: '10px' }}>
-        <h2 style={{ fontSize: '1.5rem', margin: '0 0 5px 0' }}>📱 SmartScanner POS</h2>
-        <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>Đã đồng bộ với Màn chiếu mã: <strong style={{color: '#22c55e'}}>{sessionCode}</strong></p>
+        <h2 style={{ fontSize: '1.3rem', margin: '0 0 5px 0', fontWeight: '700' }}>Scan & Go</h2>
+        <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem' }}>Session: <strong style={{color: '#22c55e', letterSpacing: '2px'}}>{sessionCode}</strong></p>
       </div>
 
-      <div style={{ padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.2)', marginBottom: '30px', textAlign: 'center' }}>
-        <p style={{ margin: 0, opacity: 0.6 }}>Hướng Camera vào món đồ để đưa vào giỏ hàng Laptop</p>
+      <div style={{ padding: '16px 20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', marginBottom: '24px', textAlign: 'center' }}>
+        <p style={{ margin: 0, opacity: 0.55, fontSize: '0.88rem' }}>Tap any product to add it to the cart on the connected device.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -66,16 +66,16 @@ export default function MobileScanner() {
                 <h4 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', color: isScanning ? '#000' : 'white' }}>{p.name}</h4>
                 <p style={{ margin: 0, color: isScanning ? 'rgba(0,0,0,0.6)' : '#a855f7', fontWeight: 'bold' }}>${p.price}</p>
               </div>
-              <div style={{ fontSize: '1.5rem' }}>
-                {isScanning ? '✅' : '📷'}
+              <div style={{ fontSize: '1.2rem', color: isScanning ? '#000' : '#64748b' }}>
+                {isScanning ? '✓' : '+'}
               </div>
             </div>
           );
         })}
       </div>
       
-      <div style={{ textAlign: 'center', marginTop: '40px', color: '#64748b', fontSize: '0.8rem' }}>
-        Powered by Stuffy Omni-channel AI
+      <div style={{ textAlign: 'center', marginTop: '40px', color: '#475569', fontSize: '0.78rem' }}>
+        Stuffy Store &mdash; Omni-channel
       </div>
     </div>
   );
