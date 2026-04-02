@@ -11,7 +11,7 @@ export default class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("🔥 MFE Component BỐC CHÁY MẤT KIỂM SOÁT:", error, errorInfo);
+    console.error('[ErrorBoundary] Uncaught error in MFE component:', error, errorInfo);
   }
 
   render() {

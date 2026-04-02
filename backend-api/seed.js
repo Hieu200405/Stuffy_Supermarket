@@ -17,17 +17,14 @@ const vipProducts = [
 async function seedDB() {
   try {
     await mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 });
-    console.log("🔗 Đã thâm nhập vào Database MongoDB...");
-    
+    console.log('[Seed] Connected to MongoDB.');
     await Product.deleteMany({});
-    console.log("🧹 Đã quét sạch toàn bộ kho hàng mẫu cũ nát.");
-    
+    console.log('[Seed] Existing products cleared.');
     await Product.insertMany(vipProducts);
-    console.log("💎 Đã đổ thành công 8 Mặt hàng Công nghệ High-end vào Siêu thị!");
-    
+    console.log('[Seed] Successfully inserted 8 products.');
     mongoose.connection.close();
   } catch (error) {
-    console.error("❌ Lỗi văng dữ liệu:", error);
+    console.error('[Seed] Failed to seed database:', error.message);
     process.exit(1);
   }
 }
