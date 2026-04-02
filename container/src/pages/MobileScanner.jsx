@@ -4,27 +4,27 @@ import { io } from "socket.io-client";
 
 const socket = io("https://stuffy-backend-api.onrender.com");
 
-// KỊCH BẢN ĐIỆN THOẠI DI ĐỘNG: QUÉT MÃ VẠCH (Giả lập màn hình dọc Điện thoại)
+// Mobile device view: simulates a barcode scanner on a phone screen
 export default function MobileScanner() {
   const { sessionCode } = useParams();
   const [products, setProducts] = useState([]);
   const [scannedId, setScannedId] = useState(null);
 
   useEffect(() => {
-    // Kéo danh mục hàng sống từ Server
+    // Fetch product catalogue from API
     fetch("https://stuffy-backend-api.onrender.com/api/products")
       .then(res => res.json())
       .then(data => setProducts(data));
       
-    // Điện thoại cũng tham gia vào Kênh vô tuyến
+    // Join the socket session channel
     socket.emit("JOIN_CART_SESSION", sessionCode);
   }, [sessionCode]);
 
   const handleScan = (product) => {
-    // Rung điện thoại nhè nhẹ (Hỗ trợ trình duyệt xịn)
+    // Vibrate on tap (supported on most mobile browsers)
     if (navigator.vibrate) navigator.vibrate(50);
     
-    // Bắn sóng thẳng sản phẩm này sang Màn hình Laptop!
+    // Emit the scanned product to the desktop session
     socket.emit("MOBILE_SCAN_ITEM", { sessionCode, product });
     
     setScannedId(product.id);

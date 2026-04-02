@@ -29,7 +29,7 @@ export default function Header() {
       <AISearchBar />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
-        <span style={{ fontWeight: '600', color: 'var(--text-muted)', cursor: 'pointer' }}>Hỗ trợ</span>
+        <span style={{ fontWeight: '600', color: 'var(--text-muted)', cursor: 'pointer' }}>Support</span>
         <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#ffedd5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: '#ea580c', border: '2px solid white', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>NV</div>
       </div>
     </header>

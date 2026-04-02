@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import FortuneWheel from "./FortuneWheel";
 
 const socket = io("https://stuffy-backend-api.onrender.com");
-// Sinh một đoạn PIN ngẫu nhiên 4 chữ số cho phiên giao dịch
+// Generate a random 4-char session PIN for the Scan & Go feature
 const SESSION_CODE = Math.random().toString(36).substring(2, 6).toUpperCase();
 
 const Cart = () => {
@@ -18,15 +18,15 @@ const Cart = () => {
   const total = discount?.discount > 0 ? rawTotal * (1 - discount.discount) : rawTotal;
 
   useEffect(() => {
-    // Bước 1: Khai báo với Server "Tui là Desktop, mã PIN của tui là đây"
+    // Step 1: Register this desktop session with the server
     socket.emit("JOIN_CART_SESSION", SESSION_CODE);
     
-    // Bước 2: Dỏng tai lên nghe sự kiện từ Server (Phát sinh khi Phone bắn)
+    // Step 2: Listen for items pushed from the mobile scanner
     socket.on("DESKTOP_RECEIVE_ITEM", (product) => {
-      // Nhét thẳng vào kho Zustand
+      // Add scanned product to Zustand store
       addToCart(product);
       
-      // Bật hiệu ứng Đèn nhấp nháy
+      // Trigger flash animation on the card
       setMagicItem(product);
       setTimeout(() => setMagicItem(null), 2500);
     });
@@ -80,7 +80,7 @@ const Cart = () => {
                   </div>
                   <div>
                     <h4 style={{ margin: "0 0 5px 0", fontSize: "1.3rem", fontWeight: '700', color: 'var(--text-main)' }}>{item.name}</h4>
-                    <p style={{ margin: 0, color: "var(--text-muted)", fontWeight: "500", fontSize: '0.9rem' }}>Mã Sản Phẩm: #{item.id.substring(0,8)}</p>
+                    <p style={{ margin: 0, color: "var(--text-muted)", fontWeight: "500", fontSize: '0.9rem' }}>SKU: #{item.id.substring(0,8)}</p>
                   </div>
                 </div>
                 

@@ -3,36 +3,34 @@ import React, { useState, useRef, useEffect } from 'react';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-// Ví dụ sản phẩm để AI có ngữ cảnh phân tích
 const PRODUCT_CONTEXT = `
-Hệ thống Stuffy Supermarket có các sản phẩm công nghệ sau:
-1. MacBook Pro M3 Max - laptop cao cấp, làm việc, lập trình, đồ họa
-2. Apple Vision Pro - kính thực tế hỗn hợp, AR/VR, 3D, xem phim
-3. Sony WH-1000XM5 - tai nghe chống ồn, nhạc, podcast, làm việc
-4. PlayStation 5 - máy chơi game, giải trí, gaming
-5. Keychron Q1 Pro - bàn phím cơ, lập trình, văn phòng
-6. Logitech MX Master 3S - chuột đồ họa, thiết kế, văn phòng
-7. GoPro Hero 12 - camera hành trình, du lịch, outdoor, quay vlog
-8. Marshall Stanmore III - loa bluetooth, âm nhạc, phòng khách
+1. MacBook Pro M3 Max - high-end laptop, programming, design, graphics
+2. Apple Vision Pro - mixed reality headset, AR/VR, 3D, media
+3. Sony WH-1000XM5 - noise-cancelling headphones, music, podcasts
+4. PlayStation 5 - gaming console, entertainment
+5. Keychron Q1 Pro - mechanical keyboard, programming, office
+6. Logitech MX Master 3S - ergonomic mouse, design, office
+7. GoPro Hero 12 - action camera, travel, vlogging, outdoor
+8. Marshall Stanmore III - bluetooth speaker, music, home audio
 `;
 
 async function callGemini(userQuery, products) {
   const productList = products.map(p => `- ${p.name} ($${p.price})`).join('\n');
   
-  const prompt = `Bạn là trợ lý AI cho siêu thị công nghệ Stuffy Supermarket.
-Dựa vào yêu cầu của khách hàng: "${userQuery}"
+  const prompt = `You are a smart shopping assistant for Stuffy Store, a tech retail platform.
+The customer is looking for: "${userQuery}"
 
-Danh sách sản phẩm trong cửa hàng:
+Available products in the store:
 ${productList}
 
-Hãy:
-1. Phân tích nhu cầu của khách hàng bằng ngôn ngữ tự nhiên (2-3 câu ngắn gọn, thân thiện).
-2. Trả về mảng JSON tên các sản phẩm phù hợp nhất (dựa ĐÚNG tên trong danh sách sản phẩm, tối đa 4 sản phẩm).
+Your task:
+1. Write a brief, friendly 1-2 sentence analysis of the customer's needs.
+2. Return a JSON array of the most relevant product names (use EXACT names from the list, max 4 products).
 
-Trả lời theo định dạng JSON sau, KHÔNG viết gì thêm ngoài JSON:
+Respond ONLY with the following JSON format, no extra text:
 {
-  "message": "Lời nhận xét / giải thích của AI (ngắn gọn, tiếng Việt, thân thiện)",
-  "matches": ["Tên sản phẩm 1", "Tên sản phẩm 2"]
+  "message": "Brief analysis of the customer's request (friendly, concise)",
+  "matches": ["Exact Product Name 1", "Exact Product Name 2"]
 }`;
 
   const response = await fetch(API_URL, {
@@ -44,13 +42,13 @@ Trả lời theo định dạng JSON sau, KHÔNG viết gì thêm ngoài JSON:
     })
   });
 
-  if (!response.ok) throw new Error(`API lỗi: ${response.status}`);
+  if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
   const data = await response.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   
-  // Trích xuất JSON từ response (đôi khi Gemini wrap trong ```json ```)
+  // Extract JSON from response (Gemini sometimes wraps it in ```json ```)
   const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('Gemini không trả về JSON hợp lệ');
+  if (!jsonMatch) throw new Error('Gemini returned invalid JSON');
   return JSON.parse(jsonMatch[0]);
 }
 
@@ -87,7 +85,7 @@ export default function AISearchBar() {
     if (e.key !== 'Enter' || !query.trim() || loading || cooldown > 0) return;
     const now = Date.now();
     if (now - lastCallRef.current < 5000) {
-      setAiResult({ message: '⏳ Chờ vài giây trước khi tìm kiếm lại nhé!', matches: [] });
+      setAiResult({ message: 'Please wait a few seconds before searching again.', matches: [] });
       return;
     }
     setLoading(true);
@@ -101,10 +99,10 @@ export default function AISearchBar() {
       window.dispatchEvent(new CustomEvent('AI_SEARCH_RESULT', { detail: { matches: result.matches, query } }));
     } catch (err) {
       if (err.message.includes('429')) {
-        setAiResult({ message: '☕ AI đang nghỉ ngơi (giới hạn 15 lần/phút của Gemini Free). Thử lại sau 60 giây!', matches: [] });
+        setAiResult({ message: `AI is on cooldown (Gemini Free Tier: 15 req/min). Please retry in 60 seconds.`, matches: [] });
         startCooldown(60);
       } else {
-        setAiResult({ message: `⚠️ Lỗi: ${err.message}`, matches: [] });
+        setAiResult({ message: `Error: ${err.message}`, matches: [] });
       }
     } finally {
       setLoading(false);
@@ -161,9 +159,9 @@ export default function AISearchBar() {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder={
-            cooldown > 0 ? `☕ AI đang nghỉ... thử lại sau ${cooldown}s` :
-            loading ? 'AI đang phân tích...' : 
-            'Hỏi AI: "Thiết lập bàn làm việc ngầu"...'
+            cooldown > 0 ? `AI on cooldown — retry in ${cooldown}s` :
+            loading ? 'AI is analyzing...' : 
+            'Ask AI: "Set up a home office"...'
           }
           disabled={loading || cooldown > 0}
           style={{
@@ -215,7 +213,7 @@ export default function AISearchBar() {
           {/* Nhãn AI */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <span style={{ fontSize: '1.2rem' }}>✨</span>
-            <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Gemini AI gợi ý</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Gemini AI suggestion</span>
           </div>
           
           {/* Lời nhận xét của AI */}
@@ -226,7 +224,7 @@ export default function AISearchBar() {
           {aiResult.matches?.length > 0 && (
             <>
               <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Sản phẩm phù hợp nhất
+                Best matches
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {aiResult.matches.map((name, i) => (

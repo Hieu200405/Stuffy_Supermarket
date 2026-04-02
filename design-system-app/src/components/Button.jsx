@@ -1,5 +1,5 @@
 import React from 'react';
-import '../index.css'; // Đảm bảo component mang theo CSS chuẩn
+import '../index.css';
 
 export default function Button({ children, onClick, style }) {
   return (
