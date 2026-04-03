@@ -7,7 +7,7 @@ const Order = require('../models/Order');
 // @route   POST /api/orders
 // @access  Private
 router.post('/', protect, async (req, res) => {
-  const { orderItems, itemsPrice, taxPrice, totalPrice, paymentMethod } = req.body;
+  const { orderItems, shippingAddress, itemsPrice, taxPrice, totalPrice, paymentMethod } = req.body;
 
   if (orderItems && orderItems.length === 0) {
     res.status(400).json({ error: 'No order items' });
@@ -18,6 +18,7 @@ router.post('/', protect, async (req, res) => {
     const order = new Order({
       user: req.user._id,
       orderItems,
+      shippingAddress,
       itemsPrice,
       taxPrice,
       totalPrice,
