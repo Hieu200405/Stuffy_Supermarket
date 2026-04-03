@@ -103,6 +103,18 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    res.json({ id: product._id.toString(), ...product._doc });
+  } catch (e) {
+    if (e.kind === 'ObjectId') return res.status(404).json({ error: 'Product not found' });
+    console.error(`[GET /api/products/${req.params.id}] Failed:`, e.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.post('/api/products', protect, admin, async (req, res) => {
   try {
     const newProduct = new Product(req.body);

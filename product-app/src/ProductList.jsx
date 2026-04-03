@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Suspense } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCartStore } from "store/store";
 import Button from "design_system/Button";
 import { io } from "socket.io-client";
@@ -9,6 +10,7 @@ const Viewer3D = React.lazy(() => import("viewer/Viewer"));
 const socket = io("https://stuffy-backend-api.onrender.com");
 
 export default function ProductList() {
+  const navigate = useNavigate();
   const addToCart = useCartStore((state) => state.addToCart);
   
   const [products, setProducts] = useState([]);
@@ -169,11 +171,11 @@ export default function ProductList() {
                       {p.category}
                     </div>
 
-                    <div style={{ background: '#f1f5f9', borderRadius: '12px', padding: '20px', marginBottom: '15px', display: 'flex', justifyContent: 'center', transition: 'all 0.3s' }}>
+                    <div style={{ background: '#f1f5f9', borderRadius: '12px', padding: '20px', marginBottom: '15px', display: 'flex', justifyContent: 'center', transition: 'all 0.3s', cursor: 'pointer' }} onClick={() => navigate(`/product/${p.id}`)}>
                       <img src={p.image} alt={p.name} style={{ width: "160px", height: "160px", objectFit: 'contain', mixBlendMode: 'multiply' }} />
                     </div>
                     
-                    <h4 style={{ margin: "0 0 4px 0", fontSize: "1.2rem", fontWeight: '700', color: 'var(--text-main)', minHeight: '50px' }}>{p.name}</h4>
+                    <h4 style={{ margin: "0 0 4px 0", fontSize: "1.2rem", fontWeight: '700', color: 'var(--text-main)', minHeight: '50px', cursor: 'pointer' }} onClick={() => navigate(`/product/${p.id}`)}>{p.name}</h4>
                     
                     {/* Reviews System */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>

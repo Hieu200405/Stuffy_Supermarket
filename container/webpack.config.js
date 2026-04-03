@@ -55,6 +55,7 @@ module.exports = {
       shared: {
         react: { singleton: true, requiredVersion: false },
         "react-dom": { singleton: true, requiredVersion: false },
+        "react-router-dom": { singleton: true, requiredVersion: false },
         zustand: { singleton: true, requiredVersion: false },
       },
     }),
