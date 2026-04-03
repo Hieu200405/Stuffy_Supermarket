@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCartStore } from "store/store";
+import { useCartStore, useWishlistStore } from "store/store";
 import Button from "design_system/Button";
 import { io } from "socket.io-client";
 
@@ -12,6 +12,7 @@ const socket = io("https://stuffy-backend-api.onrender.com");
 export default function ProductList() {
   const navigate = useNavigate();
   const addToCart = useCartStore((state) => state.addToCart);
+  const { wishlist, toggleWishlist } = useWishlistStore();
   
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -170,6 +171,13 @@ export default function ProductList() {
                     <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', color: 'var(--text-main)', fontSize: '0.7rem', fontWeight: '800', padding: '4px 10px', borderRadius: '99px', border: '1px solid var(--border-light)', zIndex: 1, textTransform: 'uppercase' }}>
                       {p.category}
                     </div>
+
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); toggleWishlist(p); }} 
+                      style={{ position: 'absolute', top: '12px', right: '100px', background: 'rgba(255,255,255,0.9)', border: '1px solid var(--border-light)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', zIndex: 2, fontSize: '1rem', transition: 'all 0.2s', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}
+                    >
+                      {wishlist.some(w => w.id === p.id) ? '❤️' : '🤍'}
+                    </button>
 
                     <div style={{ background: '#f1f5f9', borderRadius: '12px', padding: '20px', marginBottom: '15px', display: 'flex', justifyContent: 'center', transition: 'all 0.3s', cursor: 'pointer' }} onClick={() => navigate(`/product/${p.id}`)}>
                       <img src={p.image} alt={p.name} style={{ width: "160px", height: "160px", objectFit: 'contain', mixBlendMode: 'multiply' }} />

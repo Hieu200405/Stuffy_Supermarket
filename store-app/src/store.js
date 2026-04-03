@@ -76,3 +76,21 @@ export const useCartStore = create((set, get) => ({
     return { cartItems: [] };
   })
 }));
+
+export const useWishlistStore = create((set) => ({
+  wishlist: JSON.parse(localStorage.getItem('stuffy_wishlist')) || [],
+  
+  toggleWishlist: (product) => set((state) => {
+    const exists = state.wishlist.find(i => i.id === product.id);
+    let newList;
+    if (exists) {
+      newList = state.wishlist.filter(i => i.id !== product.id);
+    } else {
+      newList = [...state.wishlist, product];
+    }
+    localStorage.setItem('stuffy_wishlist', JSON.stringify(newList));
+    return { wishlist: newList };
+  }),
+
+  isInWishlist: (id) => false // We let components read from state.wishlist array
+}));

@@ -51,6 +51,7 @@ module.exports = {
         design_system: `design_system@${getUrl('DESIGN_SYSTEM_URL', 'https://stuffy-design-system-app.onrender.com')}/remoteEntry.js`,
         viewer: `viewer@${getUrl('VIEWER_URL', 'https://stuffy-3d-viewer-app.onrender.com')}/remoteEntry.js`,
         profile: `profile@${getUrl('PROFILE_URL', 'https://stuffy-profile-app.onrender.com')}/remoteEntry.js`,
+        marketing: `marketing@${getUrl('MARKETING_URL', 'https://stuffy-marketing-app.onrender.com')}/remoteEntry.js`,
       },
 
       shared: {
