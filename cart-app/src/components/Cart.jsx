@@ -3,6 +3,7 @@ import { useCartStore } from "store/store";
 import Button from "design_system/Button";
 import { io } from "socket.io-client";
 import FortuneWheel from "./FortuneWheel";
+import CheckoutModal from "./CheckoutModal";
 
 const socket = io("https://stuffy-backend-api.onrender.com");
 // Generate a random 4-char session PIN for the Scan & Go feature
@@ -12,12 +13,13 @@ const Cart = () => {
   const { cartItems, increaseQuantity, decreaseQuantity, removeFromCart, clearCart, addToCart } = useCartStore();
   const [magicItem, setMagicItem] = useState(null);
   const [showWheel, setShowWheel] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
   const [discount, setDiscount] = useState(null); // { label, discount, emoji, ... }
   
   const rawTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const total = discount?.discount > 0 ? rawTotal * (1 - discount.discount) : rawTotal;
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (shippingAddress) => {
     const userInfoString = localStorage.getItem('userInfo');
     if (!userInfoString) {
       alert("Vui lòng đăng nhập (Login) trước khi Checkout!");
@@ -36,7 +38,8 @@ const Cart = () => {
       itemsPrice: rawTotal,
       taxPrice: 0,
       totalPrice: total,
-      paymentMethod: 'Credit Card'
+      paymentMethod: 'Credit Card (Stripe Mock)',
+      shippingAddress
     };
 
     try {
@@ -51,6 +54,7 @@ const Cart = () => {
       if (res.ok) {
         alert("🎉 Đặt hàng thành công! Hóa đơn đã được lưu vào hệ thống Database.");
         clearCart();
+        setShowCheckout(false);
       } else {
         const err = await res.json();
         alert("Lỗi khi tạo hóa đơn: " + err.error);
@@ -190,7 +194,7 @@ const Cart = () => {
               </button>
             )}
 
-            <Button onClick={handleCheckout} style={{ width: "100%", fontSize: "1.1rem", padding: "18px", borderRadius: '16px' }}>
+            <Button onClick={() => setShowCheckout(true)} style={{ width: "100%", fontSize: "1.1rem", padding: "18px", borderRadius: '16px' }}>
               Proceed to Checkout
             </Button>
             
@@ -217,6 +221,15 @@ const Cart = () => {
           total={rawTotal}
           onApplyDiscount={(result) => setDiscount(result)}
           onClose={() => setShowWheel(false)}
+        />
+      )}
+
+      {/* Modal Thanh Toán An Toàn */}
+      {showCheckout && (
+        <CheckoutModal 
+          total={total}
+          onCheckout={handleCheckout}
+          onClose={() => setShowCheckout(false)}
         />
       )}
     </div>
