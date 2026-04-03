@@ -12,6 +12,7 @@ const ProductList = React.lazy(() => import("product/ProductList"));
 const ProductDetail = React.lazy(() => import("product/ProductDetail"));
 const Cart = React.lazy(() => import("cart/Cart"));
 const Admin = React.lazy(() => import("admin/App"));
+const UserProfile = React.lazy(() => import("profile/UserProfile"));
 
 const ProtectedModule = ({ children, moduleName }) => (
   <ErrorBoundary>
@@ -47,7 +48,11 @@ const Navbar = () => {
       <div style={{ position: 'absolute', right: '30px', top: '15px' }}>
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>Hi, {user.name}</span>
+            <NavLink to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <span style={{ fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', padding: '6px 12px', borderRadius: '8px', background: '#f8fafc', transition: 'all 0.2s' }} onMouseOver={e=>e.target.style.background='#f1f5f9'} onMouseOut={e=>e.target.style.background='#f8fafc'}>
+                👤 Hi, {user.name}
+              </span>
+            </NavLink>
             <button onClick={logout} style={{ padding: '6px 12px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Logout</button>
           </div>
         ) : (
@@ -92,6 +97,7 @@ export default function App() {
             } />
             <Route path="/product/:id" element={<ProtectedModule moduleName="Product Detail"><ProductDetail /></ProtectedModule>} />
             <Route path="/cart" element={<ProtectedModule moduleName="Cart"><Cart /></ProtectedModule>} />
+            <Route path="/profile" element={<ProtectedModule moduleName="Profile"><UserProfile /></ProtectedModule>} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<AdminRoute><ProtectedModule moduleName="Admin"><Admin /></ProtectedModule></AdminRoute>} />
             <Route path="/scanner/:sessionCode" element={<MobileScanner />} />
