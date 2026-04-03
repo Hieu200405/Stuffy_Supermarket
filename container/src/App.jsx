@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import "design_system/styles";
 import ErrorBoundary from "./components/ErrorBoundary";
 import MobileScanner from "./pages/MobileScanner";
+import Login from "./pages/Login";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 const Header = React.lazy(() => import("header/Header"));
 const ProductList = React.lazy(() => import("product/ProductList"));
@@ -22,25 +25,49 @@ const ProtectedModule = ({ children, moduleName }) => (
 );
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+
   return (
-    <nav style={{ display: 'flex', justifyContent: 'center', gap: '40px', padding: '20px 0 0 0', borderBottom: '1px solid var(--border-light)', background: 'white' }}>
-      <NavLink to="/" end style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? 'var(--primary-color)' : 'var(--text-muted)', borderBottom: isActive ? '3px solid var(--primary-color)' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
-        Products
-      </NavLink>
-      <NavLink to="/cart" style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? 'var(--primary-color)' : 'var(--text-muted)', borderBottom: isActive ? '3px solid var(--primary-color)' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
-        Cart
-      </NavLink>
-      <NavLink to="/admin" style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? '#ef4444' : 'var(--text-muted)', borderBottom: isActive ? '3px solid #ef4444' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
-        Admin
-      </NavLink>
+    <nav style={{ display: 'flex', justifyContent: 'center', gap: '40px', padding: '20px 0 0 0', borderBottom: '1px solid var(--border-light)', background: 'white', position: 'relative' }}>
+      <div style={{ display: 'flex', gap: '40px' }}>
+        <NavLink to="/" end style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? 'var(--primary-color)' : 'var(--text-muted)', borderBottom: isActive ? '3px solid var(--primary-color)' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
+          Products
+        </NavLink>
+        <NavLink to="/cart" style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? 'var(--primary-color)' : 'var(--text-muted)', borderBottom: isActive ? '3px solid var(--primary-color)' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
+          Cart
+        </NavLink>
+        {user?.role === 'admin' && (
+          <NavLink to="/admin" style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? '#ef4444' : 'var(--text-muted)', borderBottom: isActive ? '3px solid #ef4444' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
+            Admin
+          </NavLink>
+        )}
+      </div>
+
+      <div style={{ position: 'absolute', right: '30px', top: '15px' }}>
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>Hi, {user.name}</span>
+            <button onClick={logout} style={{ padding: '6px 12px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Logout</button>
+          </div>
+        ) : (
+          <NavLink to="/login" style={{ padding: '8px 16px', background: 'var(--primary-color)', color: 'white', textDecoration: 'none', borderRadius: '6px', fontWeight: 'bold' }}>Login</NavLink>
+        )}
+      </div>
     </nav>
   );
 };
 
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div>Loading...</div>;
+  return user && user.role === 'admin' ? children : <Navigate to="/login" />;
+};
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <AuthProvider>
+      <BrowserRouter>
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <ProtectedModule moduleName="Header"><Header /></ProtectedModule>
         <Navbar />
         
@@ -63,11 +90,13 @@ export default function App() {
               </>
             } />
             <Route path="/cart" element={<ProtectedModule moduleName="Cart"><Cart /></ProtectedModule>} />
-            <Route path="/admin" element={<ProtectedModule moduleName="Admin"><Admin /></ProtectedModule>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={<AdminRoute><ProtectedModule moduleName="Admin"><Admin /></ProtectedModule></AdminRoute>} />
             <Route path="/scanner/:sessionCode" element={<MobileScanner />} />
           </Routes>
         </main>
       </div>
     </BrowserRouter>
+    </AuthProvider>
   );
 }

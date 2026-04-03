@@ -4,10 +4,15 @@ const cors = require('cors');
 const http = require('http'); // HTTP server
 const { Server } = require('socket.io'); // Socket.io WebSocket thư viện siêu mạnh
 const Product = require('./models/Product');
+const authRoutes = require('./routes/auth');
+const { protect, admin } = require('./middleware/auth');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Nâng cấp App Express thành Server HTTP hỗ trợ đường truyền Socket liên tục 2 chiều
 const server = http.createServer(app);
@@ -64,7 +69,7 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', protect, admin, async (req, res) => {
   try {
     const newProduct = new Product(req.body);
     await newProduct.save();
@@ -77,7 +82,7 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-app.put('/api/products/:id', async (req, res) => {
+app.put('/api/products/:id', protect, admin, async (req, res) => {
   try {
     const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     const formatted = { id: updated._id.toString(), ...updated._doc };
@@ -90,7 +95,7 @@ app.put('/api/products/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/products/:id', async (req, res) => {
+app.delete('/api/products/:id', protect, admin, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     io.emit('PRODUCT_DELETED', req.params.id);
