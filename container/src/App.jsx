@@ -9,6 +9,7 @@ import { Navigate } from "react-router-dom";
 
 const Header = React.lazy(() => import("header/Header"));
 const ProductList = React.lazy(() => import("product/ProductList"));
+const ProductDetail = React.lazy(() => import("product/ProductDetail"));
 const Cart = React.lazy(() => import("cart/Cart"));
 const Admin = React.lazy(() => import("admin/App"));
 
@@ -89,6 +90,7 @@ export default function App() {
                 <ProtectedModule moduleName="Products"><ProductList /></ProtectedModule>
               </>
             } />
+            <Route path="/product/:id" element={<ProtectedModule moduleName="Product Detail"><ProductDetail /></ProtectedModule>} />
             <Route path="/cart" element={<ProtectedModule moduleName="Cart"><Cart /></ProtectedModule>} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<AdminRoute><ProtectedModule moduleName="Admin"><Admin /></ProtectedModule></AdminRoute>} />

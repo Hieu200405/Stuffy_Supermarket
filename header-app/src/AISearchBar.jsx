@@ -88,8 +88,10 @@ export default function AISearchBar() {
     setAiResult(null);
     lastCallRef.current = now;
     try {
-      const products = await fetch('https://stuffy-backend-api.onrender.com/api/products')
-        .then(r => r.json()).catch(() => []);
+      const resp = await fetch('https://stuffy-backend-api.onrender.com/api/products?pageNumber=1&keyword=' + encodeURIComponent(query))
+        .then(r => r.json()).catch(() => ({ products: [] }));
+      
+      const products = resp.products || [];
       const result = await callGemini(query, products);
       setAiResult(result);
       window.dispatchEvent(new CustomEvent('AI_SEARCH_RESULT', { detail: { matches: result.matches, query } }));

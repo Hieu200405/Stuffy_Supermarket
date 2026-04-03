@@ -1,0 +1,231 @@
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useCartStore } from "store/store";
+import Button from "design_system/Button";
+
+export default function ProductDetail() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const addToCart = useCartStore((state) => state.addToCart);
+
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [similarProducts, setSimilarProducts] = useState([]);
+  
+  // Review Formulation State
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [submitError, setSubmitError] = useState("");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    setLoading(true);
+    // Fetch product details
+    fetch(`https://stuffy-backend-api.onrender.com/api/products/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) {
+          setProduct(data);
+          // Fetch similar products based on category
+          fetch(`https://stuffy-backend-api.onrender.com/api/products?category=${data.category}&pageNumber=1`)
+            .then(res => res.json())
+            .then(simData => {
+              if (simData.products) {
+                setSimilarProducts(simData.products.filter(p => p.id !== data.id).slice(0, 4));
+              }
+            });
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, [id]);
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+    setSubmitError("");
+    const userInfoString = localStorage.getItem('userInfo');
+    if (!userInfoString) {
+      setSubmitError("You must be logged in to review.");
+      return;
+    }
+    const { token } = JSON.parse(userInfoString);
+
+    try {
+      const res = await fetch(`https://stuffy-backend-api.onrender.com/api/products/${id}/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ rating, comment })
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        // Optimistic update or refetch
+        setComment("");
+        alert("Review submitted successfully!");
+        // Small hack to append locally without refetching
+        setProduct((prev) => ({
+          ...prev,
+          reviews: [
+            { _id: Date.now(), name: JSON.parse(userInfoString).name, rating, comment, createdAt: new Date().toISOString() },
+            ...prev.reviews
+          ],
+          numReviews: prev.numReviews + 1
+        }));
+      } else {
+        setSubmitError(data.error || "Failed to submit review");
+      }
+    } catch (err) {
+      setSubmitError("Network error: " + err.message);
+    }
+  };
+
+  const renderStars = (ratingVal) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+        stars.push(<span key={i} style={{ color: i <= Math.round(ratingVal) ? '#f59e0b' : '#e2e8f0', fontSize: '1.2rem' }}>★</span>);
+    }
+    return <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>{stars}</div>;
+  };
+
+  if (loading) return <div style={{ padding: '80px', textAlign: 'center', fontSize: '1.2rem', color: 'var(--text-muted)' }}>Loading Product Data...</div>;
+  if (!product) return <div style={{ padding: '80px', textAlign: 'center', fontSize: '1.2rem', color: '#ef4444' }}>Product not found.</div>;
+
+  return (
+    <div style={{ padding: '20px 0' }}>
+      <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', fontWeight: 'bold', marginBottom: '20px', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+        ← Back to Shop
+      </button>
+
+      {/* Tầng 1: Chi tiết Sản phẩm & Hành động Mua */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', marginBottom: '60px', background: 'white', padding: '40px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.03)' }}>
+        
+        {/* Hình ảnh */}
+        <div style={{ background: '#f8fafc', borderRadius: '20px', padding: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid var(--border-light)' }}>
+          <img src={product.image} alt={product.name} style={{ width: '100%', maxWidth: '400px', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+        </div>
+
+        {/* Thông tin */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={{ color: '#6366f1', textTransform: 'uppercase', fontWeight: '800', fontSize: '0.8rem', letterSpacing: '1px', marginBottom: '10px' }}>{product.category}</span>
+          <h1 style={{ margin: '0 0 15px 0', fontSize: '2.4rem', fontWeight: '900', color: 'var(--text-main)', lineHeight: 1.2 }}>{product.name}</h1>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
+            {renderStars(product.rating || 0)}
+            <span style={{ color: '#64748b', fontWeight: '600', fontSize: '0.9rem' }}>{product.numReviews} Student Reviews</span>
+          </div>
+
+          <div style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--primary-color)', marginBottom: '30px' }}>
+            ${product.price}
+          </div>
+
+          <p style={{ color: 'var(--text-muted)', lineHeight: '1.8', fontSize: '1.05rem', marginBottom: '40px' }}>
+            {product.description}
+          </p>
+
+          <div style={{ marginTop: 'auto', display: 'flex', gap: '15px' }}>
+            <Button onClick={() => addToCart(product)} style={{ flex: 1, padding: '18px', fontSize: '1.1rem', borderRadius: '12px' }}>
+              Add to Cart
+            </Button>
+            <button style={{ padding: '0 20px', border: '2px solid var(--border-light)', background: 'white', borderRadius: '12px', cursor: 'pointer', fontSize: '1.5rem', transition: 'all 0.2s' }} onMouseOver={e=>e.target.style.borderColor='var(--primary-color)'} onMouseOut={e=>e.target.style.borderColor='var(--border-light)'}>
+              ❤️
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: '20px', marginTop: '25px', color: '#64748b', fontSize: '0.85rem', fontWeight: '600' }}>
+            <span>✓ Free Shipping Options</span>
+            <span>✓ 30-Day Return Policy</span>
+            <span>✓ Genuine Warranty</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Tầng 2: Hệ thống Reviews & UGC */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 350px) 1fr', gap: '40px', marginBottom: '60px' }}>
+        {/* Form Đánh giá */}
+        <div style={{ background: '#f8fafc', padding: '30px', borderRadius: '20px', border: '1px solid var(--border-light)', height: 'fit-content' }}>
+          <h3 style={{ margin: '0 0 20px 0', fontSize: '1.3rem', fontWeight: '800' }}>Write a Review</h3>
+          {submitError && <div style={{ color: '#ef4444', marginBottom: '15px', fontSize: '0.9rem', padding: '10px', background: '#fef2f2', borderRadius: '8px' }}>{submitError}</div>}
+          <form onSubmit={submitReview} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '0.9rem' }}>Rating (1-5)</label>
+              <select value={rating} onChange={e => setRating(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-light)', outline: 'none' }}>
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Very Good</option>
+                <option value="3">3 - Average</option>
+                <option value="2">2 - Poor</option>
+                <option value="1">1 - Terrible</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '0.9rem' }}>Your Experience</label>
+              <textarea 
+                required 
+                placeholder="Share details of your own experience with this product..." 
+                value={comment} onChange={e => setComment(e.target.value)} 
+                style={{ width: '100%', padding: '12px', boxSizing: 'border-box', borderRadius: '8px', border: '1px solid var(--border-light)', outline: 'none', minHeight: '120px', resize: 'vertical' }}
+              />
+            </div>
+            <Button type="submit">Submit Review</Button>
+          </form>
+        </div>
+
+        {/* Danh sách Reviews */}
+        <div>
+          <h3 style={{ margin: '0 0 25px 0', fontSize: '1.6rem', fontWeight: '800' }}>Customer Reviews</h3>
+          {product.reviews && product.reviews.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {product.reviews.map(review => (
+                <div key={review._id} style={{ padding: '25px', background: 'white', borderRadius: '16px', boxShadow: '0 5px 15px rgba(0,0,0,0.02)', border: '1px solid var(--border-light)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-color), #8b5cf6)', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                        {review.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: '700', color: 'var(--text-main)', fontSize: '1.05rem' }}>{review.name}</div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{new Date(review.createdAt).toLocaleDateString()}</div>
+                      </div>
+                    </div>
+                    {renderStars(review.rating)}
+                  </div>
+                  <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.6', fontSize: '0.95rem' }}>{review.comment}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ padding: '40px', textAlign: 'center', background: '#f8fafc', borderRadius: '16px', border: '2px dashed var(--border-light)' }}>
+              <span style={{ fontSize: '3rem', opacity: 0.2 }}>📝</span>
+              <p style={{ margin: '10px 0 0 0', color: 'var(--text-muted)' }}>No reviews yet. Be the first to review this product!</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Tầng 3: Cross Selling */}
+      {similarProducts.length > 0 && (
+        <div>
+          <h3 style={{ margin: '0 0 25px 0', fontSize: '1.6rem', fontWeight: '800' }}>Similar Products</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "20px" }}>
+            {similarProducts.map(p => (
+              <div key={p.id} className="ds-glass-card" style={{ padding: '20px', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', border: '1px solid transparent' }} onClick={() => navigate(`/product/${p.id}`)} onMouseOver={e=>e.currentTarget.style.borderColor='var(--primary-color)'} onMouseOut={e=>e.currentTarget.style.borderColor='transparent'}>
+                <div style={{ background: '#f1f5f9', borderRadius: '12px', padding: '15px', marginBottom: '15px', display: 'flex', justifyContent: 'center' }}>
+                  <img src={p.image} alt={p.name} style={{ width: "120px", height: "120px", objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                </div>
+                <h4 style={{ margin: "0 0 8px 0", fontSize: "1.05rem", fontWeight: '700', color: 'var(--text-main)' }}>{p.name}</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: "800", color: "var(--primary-color)" }}>${p.price}</span>
+                  {renderStars(p.rating || 0)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

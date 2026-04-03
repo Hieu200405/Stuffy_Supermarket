@@ -65,11 +65,53 @@ mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 })
 
 app.get('/api/products', async (req, res) => {
   try {
-    const products = await Product.find();
-    res.json(products.map(p => ({ id: p._id.toString(), name: p.name, price: p.price, image: p.image, description: p.description })));
+    const pageSize = 8;
+    const page = Number(req.query.pageNumber) || 1;
+    
+    // Tìm kiếm theo Category hoặc Tên hoặc Tất cả
+    const keyword = req.query.keyword
+      ? { name: { $regex: req.query.keyword, $options: 'i' } }
+      : {};
+      
+    const categoryQuery = req.query.category && req.query.category !== 'All' 
+      ? { category: req.query.category } 
+      : {};
+
+    const count = await Product.countDocuments({ ...keyword, ...categoryQuery });
+    const products = await Product.find({ ...keyword, ...categoryQuery })
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
+
+    res.json({
+      products: products.map(p => ({ 
+        id: p._id.toString(), 
+        name: p.name, 
+        price: p.price, 
+        image: p.image, 
+        description: p.description,
+        category: p.category,
+        rating: p.rating,
+        numReviews: p.numReviews
+      })),
+      page,
+      pages: Math.ceil(count / pageSize),
+      total: count
+    });
   } catch (e) { 
     console.error('[GET /api/products] Database query failed:', e.message);
     res.status(500).json({ error: 'Internal server error: failed to retrieve products' }); 
+  }
+});
+
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    res.json({ id: product._id.toString(), ...product._doc });
+  } catch (e) {
+    if (e.kind === 'ObjectId') return res.status(404).json({ error: 'Product not found' });
+    console.error(`[GET /api/products/${req.params.id}] Failed:`, e.message);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -94,8 +136,44 @@ app.put('/api/products/:id', protect, admin, async (req, res) => {
     io.emit('PRICE_UPDATED', formatted);
     res.json(formatted);
   } catch (e) { 
-    console.error(`[PUT /api/products/${'{req.params.id}'}] Failed to update product:`, e.message);
+    console.error(`[PUT /api/products/${req.params.id}] Failed to update product:`, e.message);
     res.status(500).json({ error: 'Internal server error: failed to update product' }); 
+  }
+});
+
+app.post('/api/products/:id/reviews', protect, async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    const product = await Product.findById(req.params.id);
+
+    if (product) {
+      const alreadyReviewed = product.reviews.find(
+        (r) => r.user.toString() === req.user._id.toString()
+      );
+
+      if (alreadyReviewed) {
+        res.status(400).json({ error: 'Product already reviewed' });
+        return;
+      }
+
+      const review = {
+        name: req.user.name,
+        rating: Number(rating),
+        comment,
+        user: req.user._id,
+      };
+
+      product.reviews.push(review);
+      product.numReviews = product.reviews.length;
+      product.rating = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
+
+      await product.save();
+      res.status(201).json({ message: 'Review added' });
+    } else {
+      res.status(404).json({ error: 'Product not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Server error processing review' });
   }
 });
 
