@@ -13,6 +13,8 @@ const ProductDetail = React.lazy(() => import("product/ProductDetail"));
 const Cart = React.lazy(() => import("cart/Cart"));
 const Admin = React.lazy(() => import("admin/App"));
 const UserProfile = React.lazy(() => import("profile/UserProfile"));
+const FlashSaleBanner = React.lazy(() => import("marketing/FlashSaleBanner"));
+const VoucherWallet = React.lazy(() => import("marketing/VoucherWallet"));
 
 const ProtectedModule = ({ children, moduleName }) => (
   <ErrorBoundary>
@@ -88,10 +90,12 @@ export default function App() {
                   <p style={{ margin: 0, opacity: 0.75, fontSize: '1.05rem', maxWidth: '460px', lineHeight: 1.6 }}>A modern commerce platform built on Micro Frontends architecture with real-time data synchronization.</p>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
-                  <span style={{ background: 'rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>8 MFE Modules</span>
+                  <span style={{ background: 'rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>9 MFE Modules</span>
                   <span style={{ background: 'rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>Socket.IO · MongoDB · Docker</span>
                 </div>
               </div>
+                <ProtectedModule moduleName="Flash Sale"><FlashSaleBanner /></ProtectedModule>
+                <div style={{ marginBottom: '40px' }}><ProtectedModule moduleName="Voucher Wallet"><VoucherWallet /></ProtectedModule></div>
                 <ProtectedModule moduleName="Products"><ProductList /></ProtectedModule>
               </>
             } />

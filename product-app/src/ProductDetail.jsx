@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useCartStore } from "store/store";
+import { useCartStore, useWishlistStore } from "store/store";
 import Button from "design_system/Button";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const addToCart = useCartStore((state) => state.addToCart);
+  const { wishlist, toggleWishlist } = useWishlistStore();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -132,8 +133,12 @@ export default function ProductDetail() {
             <Button onClick={() => addToCart(product)} style={{ flex: 1, padding: '18px', fontSize: '1.1rem', borderRadius: '12px' }}>
               Add to Cart
             </Button>
-            <button style={{ padding: '0 20px', border: '2px solid var(--border-light)', background: 'white', borderRadius: '12px', cursor: 'pointer', fontSize: '1.5rem', transition: 'all 0.2s' }} onMouseOver={e=>e.target.style.borderColor='var(--primary-color)'} onMouseOut={e=>e.target.style.borderColor='var(--border-light)'}>
-              ❤️
+            <button 
+              onClick={() => toggleWishlist(product)}
+              style={{ padding: '0 20px', border: '2px solid var(--border-light)', background: 'white', borderRadius: '12px', cursor: 'pointer', fontSize: '1.5rem', transition: 'all 0.2s' }} 
+              onMouseOver={e=>e.target.style.borderColor='var(--primary-color)'} onMouseOut={e=>e.target.style.borderColor='var(--border-light)'}
+            >
+              {wishlist.some(w => w.id === product.id) ? '❤️' : '🤍'}
             </button>
           </div>
           <div style={{ display: 'flex', gap: '20px', marginTop: '25px', color: '#64748b', fontSize: '0.85rem', fontWeight: '600' }}>
@@ -212,7 +217,15 @@ export default function ProductDetail() {
           <h3 style={{ margin: '0 0 25px 0', fontSize: '1.6rem', fontWeight: '800' }}>Similar Products</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "20px" }}>
             {similarProducts.map(p => (
-              <div key={p.id} className="ds-glass-card" style={{ padding: '20px', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', border: '1px solid transparent' }} onClick={() => navigate(`/product/${p.id}`)} onMouseOver={e=>e.currentTarget.style.borderColor='var(--primary-color)'} onMouseOut={e=>e.currentTarget.style.borderColor='transparent'}>
+              <div key={p.id} className="ds-glass-card" style={{ padding: '20px', borderRadius: '16px', position: 'relative', cursor: 'pointer', transition: 'all 0.2s', border: '1px solid transparent' }} onClick={() => navigate(`/product/${p.id}`)} onMouseOver={e=>e.currentTarget.style.borderColor='var(--primary-color)'} onMouseOut={e=>e.currentTarget.style.borderColor='transparent'}>
+                
+                <button 
+                  onClick={(e) => { e.stopPropagation(); toggleWishlist(p); }} 
+                  style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255,255,255,0.9)', border: '1px solid var(--border-light)', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', zIndex: 2, fontSize: '0.9rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}
+                >
+                  {wishlist.some(w => w.id === p.id) ? '❤️' : '🤍'}
+                </button>
+
                 <div style={{ background: '#f1f5f9', borderRadius: '12px', padding: '15px', marginBottom: '15px', display: 'flex', justifyContent: 'center' }}>
                   <img src={p.image} alt={p.name} style={{ width: "120px", height: "120px", objectFit: 'contain', mixBlendMode: 'multiply' }} />
                 </div>
