@@ -4,12 +4,14 @@ const ProductForm = ({ onAdd, onUpdate, editing }) => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("Laptops");
 
   useEffect(() => {
     if (editing) {
       setName(editing.name);
       setPrice(editing.price);
       setDescription(editing.description || "");
+      setCategory(editing.category || "Laptops");
     }
   }, [editing]);
 
@@ -23,6 +25,7 @@ const ProductForm = ({ onAdd, onUpdate, editing }) => {
       name,
       price: Number(price),
       description,
+      category,
     };
 
     editing ? onUpdate(product) : onAdd(product);
@@ -30,6 +33,7 @@ const ProductForm = ({ onAdd, onUpdate, editing }) => {
     setName("");
     setPrice("");
     setDescription("");
+    setCategory("Laptops");
   };
 
   const inputStyle = {
@@ -75,6 +79,20 @@ const ProductForm = ({ onAdd, onUpdate, editing }) => {
           onChange={e => setDescription(e.target.value)}
           style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
         />
+
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.88rem', fontWeight: '600', color: 'var(--text-muted)' }}>Category</label>
+        <select
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+          style={inputStyle}
+        >
+          <option value="Laptops">Laptops</option>
+          <option value="Phones">Phones</option>
+          <option value="Audio">Audio</option>
+          <option value="Gaming">Gaming</option>
+          <option value="Video">Video</option>
+          <option value="Accessories">Accessories</option>
+        </select>
 
         <button type="submit" className="ds-button" style={{ width: '100%', marginTop: '10px' }}>
           {editing ? 'Save Changes' : 'Add Product'}

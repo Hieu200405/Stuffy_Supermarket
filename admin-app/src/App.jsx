@@ -8,9 +8,9 @@ const App = () => {
 
   // KÉO DATA SỐNG TỪ BACKEND
   const fetchProducts = () => {
-    fetch("https://stuffy-backend-api.onrender.com/api/products")
+    fetch("https://stuffy-backend-api.onrender.com/api/products?pageNumber=1")
       .then(res => res.json())
-      .then(data => setProducts(data));
+      .then(data => setProducts(data.products || []));
   };
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const App = () => {
     fetch("https://stuffy-backend-api.onrender.com/api/products", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-      body: JSON.stringify({ name: product.name, price: Number(product.price), description: product.description })
+      body: JSON.stringify({ name: product.name, price: Number(product.price), description: product.description, category: product.category })
     })
     .then(res => res.json())
     .then(newP => setProducts([...products, newP]));
@@ -37,7 +37,7 @@ const App = () => {
     fetch(`https://stuffy-backend-api.onrender.com/api/products/${updated.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-      body: JSON.stringify({ name: updated.name, price: Number(updated.price), description: updated.description })
+      body: JSON.stringify({ name: updated.name, price: Number(updated.price), description: updated.description, category: updated.category })
     })
     .then(res => res.json())
     .then(updatedP => {
