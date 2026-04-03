@@ -17,11 +17,17 @@ const App = () => {
     fetchProducts();
   }, []);
 
+  const getToken = () => {
+    const userInfoString = localStorage.getItem('userInfo');
+    if (!userInfoString) return '';
+    try { return JSON.parse(userInfoString).token; } catch (e) { return ''; }
+  };
+
   const addProduct = (product) => {
     fetch("https://stuffy-backend-api.onrender.com/api/products", {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: product.name, price: Number(product.price) })
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify({ name: product.name, price: Number(product.price), description: product.description })
     })
     .then(res => res.json())
     .then(newP => setProducts([...products, newP]));
@@ -30,8 +36,8 @@ const App = () => {
   const updateProduct = (updated) => {
     fetch(`https://stuffy-backend-api.onrender.com/api/products/${updated.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: updated.name, price: Number(updated.price) })
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify({ name: updated.name, price: Number(updated.price), description: updated.description })
     })
     .then(res => res.json())
     .then(updatedP => {
@@ -41,7 +47,10 @@ const App = () => {
   };
 
   const deleteProduct = (id) => {
-    fetch(`https://stuffy-backend-api.onrender.com/api/products/${id}`, { method: 'DELETE' })
+    fetch(`https://stuffy-backend-api.onrender.com/api/products/${id}`, { 
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
     .then(() => setProducts(products.filter(p => p.id !== id)));
   };
 
