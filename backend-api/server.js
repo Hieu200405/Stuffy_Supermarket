@@ -57,7 +57,7 @@ mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 })
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find();
-    res.json(products.map(p => ({ id: p._id.toString(), name: p.name, price: p.price, image: p.image })));
+    res.json(products.map(p => ({ id: p._id.toString(), name: p.name, price: p.price, image: p.image, description: p.description })));
   } catch (e) { 
     console.error('[GET /api/products] Database query failed:', e.message);
     res.status(500).json({ error: 'Internal server error: failed to retrieve products' }); 
