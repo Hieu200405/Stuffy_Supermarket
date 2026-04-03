@@ -5,6 +5,8 @@ const http = require('http'); // HTTP server
 const { Server } = require('socket.io'); // Socket.io WebSocket thư viện siêu mạnh
 const Product = require('./models/Product');
 const authRoutes = require('./routes/auth');
+const cartRoutes = require('./routes/cart');
+const orderRoutes = require('./routes/orders');
 const { protect, admin } = require('./middleware/auth');
 
 const app = express();
@@ -13,6 +15,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Nâng cấp App Express thành Server HTTP hỗ trợ đường truyền Socket liên tục 2 chiều
 const server = http.createServer(app);

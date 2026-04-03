@@ -1,27 +1,78 @@
 import { create } from "zustand";
 
-export const useCartStore = create((set) => ({
+const syncToServer = async (cartItems) => {
+  const userInfoString = localStorage.getItem('userInfo');
+  if (!userInfoString) return;
+  try {
+    const { token } = JSON.parse(userInfoString);
+    if (!token) return;
+    
+    await fetch("https://stuffy-backend-api.onrender.com/api/cart", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ cartItems })
+    });
+  } catch (e) {
+    console.error("Failed to sync cart", e);
+  }
+};
+
+export const useCartStore = create((set, get) => ({
   cartItems: [],
   
+  loadCartFromServer: async () => {
+    const userInfoString = localStorage.getItem('userInfo');
+    if (!userInfoString) return;
+    try {
+      const { token } = JSON.parse(userInfoString);
+      if (!token) return;
+      const res = await fetch("https://stuffy-backend-api.onrender.com/api/cart", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        set({ cartItems: data });
+      }
+    } catch (e) {
+      console.error("Failed to load cart", e);
+    }
+  },
+
   addToCart: (product) => set((state) => {
     const existing = state.cartItems.find(i => i.id === product.id);
+    let newItems;
     if (existing) {
-      return { cartItems: state.cartItems.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i) };
+      newItems = state.cartItems.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
+    } else {
+      newItems = [...state.cartItems, { ...product, quantity: 1 }];
     }
-    return { cartItems: [...state.cartItems, { ...product, quantity: 1 }] };
+    syncToServer(newItems);
+    return { cartItems: newItems };
   }),
 
-  removeFromCart: (id) => set((state) => ({
-    cartItems: state.cartItems.filter(i => i.id !== id)
-  })),
+  removeFromCart: (id) => set((state) => {
+    const newItems = state.cartItems.filter(i => i.id !== id);
+    syncToServer(newItems);
+    return { cartItems: newItems };
+  }),
 
-  increaseQuantity: (id) => set((state) => ({
-    cartItems: state.cartItems.map(i => i.id === id ? { ...i, quantity: i.quantity + 1 } : i)
-  })),
+  increaseQuantity: (id) => set((state) => {
+    const newItems = state.cartItems.map(i => i.id === id ? { ...i, quantity: i.quantity + 1 } : i);
+    syncToServer(newItems);
+    return { cartItems: newItems };
+  }),
 
-  decreaseQuantity: (id) => set((state) => ({
-    cartItems: state.cartItems.map(i => i.id === id && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i)
-  })),
+  decreaseQuantity: (id) => set((state) => {
+    const newItems = state.cartItems.map(i => i.id === id && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i);
+    syncToServer(newItems);
+    return { cartItems: newItems };
+  }),
 
-  clearCart: () => set({ cartItems: [] })
+  clearCart: () => set((state) => {
+    syncToServer([]);
+    return { cartItems: [] };
+  })
 }));

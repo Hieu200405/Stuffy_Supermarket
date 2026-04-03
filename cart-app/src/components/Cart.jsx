@@ -17,6 +17,49 @@ const Cart = () => {
   const rawTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const total = discount?.discount > 0 ? rawTotal * (1 - discount.discount) : rawTotal;
 
+  const handleCheckout = async () => {
+    const userInfoString = localStorage.getItem('userInfo');
+    if (!userInfoString) {
+      alert("Vui lòng đăng nhập (Login) trước khi Checkout!");
+      return;
+    }
+    const { token } = JSON.parse(userInfoString);
+
+    const orderPayload = {
+      orderItems: cartItems.map(item => ({
+        name: item.name,
+        qty: item.quantity,
+        image: item.image,
+        price: item.price,
+        product: item.id
+      })),
+      itemsPrice: rawTotal,
+      taxPrice: 0,
+      totalPrice: total,
+      paymentMethod: 'Credit Card'
+    };
+
+    try {
+      const res = await fetch("https://stuffy-backend-api.onrender.com/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(orderPayload)
+      });
+      if (res.ok) {
+        alert("🎉 Đặt hàng thành công! Hóa đơn đã được lưu vào hệ thống Database.");
+        clearCart();
+      } else {
+        const err = await res.json();
+        alert("Lỗi khi tạo hóa đơn: " + err.error);
+      }
+    } catch (e) {
+      alert("Lỗi mạng: " + e.message);
+    }
+  };
+
   useEffect(() => {
     // Step 1: Register this desktop session with the server
     socket.emit("JOIN_CART_SESSION", SESSION_CODE);
@@ -147,7 +190,7 @@ const Cart = () => {
               </button>
             )}
 
-            <Button style={{ width: "100%", fontSize: "1.1rem", padding: "18px", borderRadius: '16px' }}>
+            <Button onClick={handleCheckout} style={{ width: "100%", fontSize: "1.1rem", padding: "18px", borderRadius: '16px' }}>
               Proceed to Checkout
             </Button>
             
