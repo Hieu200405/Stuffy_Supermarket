@@ -9,9 +9,12 @@ const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/orders');
 const { protect, admin } = require('./middleware/auth');
 
+const cookieParser = require('cookie-parser');
+
 const app = express();
-app.use(cors());
+app.use(cors({ origin: true, credentials: true })); // Allow all origins for simplicity in this demo, but with credentials
 app.use(express.json());
+app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
