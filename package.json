@@ -11,7 +11,8 @@
   "workspaces": [
     "container",
     "backend-api",
-    "*-app"
+    "*-app",
+    "packages/*"
   ],
   "devDependencies": {
     "turbo": "^2.9.3"
