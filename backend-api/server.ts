@@ -4,6 +4,7 @@ import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
+import * as Sentry from "@sentry/node";
 import Product from './models/Product';
 // @ts-ignore
 import authRoutes from './routes/auth';
@@ -16,6 +17,12 @@ import { protect, admin } from './middleware/auth';
 import { Product as SharedProduct } from '@stuffy/types';
 
 const app = express();
+
+Sentry.init({
+  dsn: "https://your-dsn-here@o0.ingest.sentry.io/0", // Replace with real Sentry DSN
+  tracesSampleRate: 1.0,
+});
+
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
@@ -98,6 +105,8 @@ app.post('/api/products', protect, admin, async (req: Request, res: Response) =>
     res.status(500).json({ error: e.message }); 
   }
 });
+
+Sentry.setupExpressErrorHandler(app);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`[Server] Listening on port ${PORT}`));

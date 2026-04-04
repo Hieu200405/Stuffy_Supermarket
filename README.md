@@ -1,57 +1,65 @@
-# 🛒 Stuffy Supermarket - Micro Frontends E-commerce
+# Stuffy Supermarket - Enterprise Micro-frontends E-commerce
 
-A modern, scalable e-commerce platform built using a **Micro Frontends** architecture. The project leverages **Webpack 5 Module Federation** to split the frontend into independent, hot-deployable, and scalable sub-applications that come together seamlessly at runtime.
+Stuffy Supermarket is a modern, high-performance e-commerce platform built with a robust Micro-frontends (MFE) architecture. This project demonstrates advanced engineering patterns, including real-time synchronization, 3D interactivity, and a standardized design system, all managed within a strictly typed monorepo environment.
 
-## 🏗️ Architecture & Apps
+## Architecture Overview
 
-The ecosystem consists of 5 independent applications:
+The system is orchestrated using Webpack 5 Module Federation, allowing independent teams to develop, test, and deploy sub-applications (remotes) that are seamlessly integrated into a main App Shell (host) at runtime.
 
-- **📦 Container (`container`)**: The main App Shell that uses `React.lazy` to dynamically orchestrate and load all other components (Port 3000).
-- **🏷️ Header App (`header-app`)**: Global site header and navigation (Port 3001).
-- **🛍️ Product App (`product-app`)**: Product catalog display and interaction (Port 3002).
-- **🛒 Cart App (`cart-app`)**: Shopping cart and total price generation (Port 3003).
-- **⚙️ Admin App (`admin-app`)**: Dashboard for managing products and inventory (Port 3004).
+### Core Applications
+- **Container (App Shell)**: The primary entry point (Port 3000) that dynamically orchestrates and loads all micro-frontends using React Suspense.
+- **Header App**: Provides centralized navigation, AI-powered search, and a global language switcher (Port 3001).
+- **Product App**: Handles the complex product catalog, category filtering, and 3D AR product visualization (Port 3002).
+- **Cart App**: Manages local and server-synced shopping cart states with real-time price calculations (Port 3003).
+- **Admin App**: An enterprise-grade dashboard for product management and inventory tracking (Port 3004).
+- **Store App**: A headless utility MFE providing centralized API services (TypeScript), global state (Zustand), and i18n synchronization (Port 3005).
+- **Design System**: A shared UI library containing reusable components like GlassCard and Button, documented with Storybook (Port 3006).
+- **3D Viewer**: A heavy-duty Three.js engine for interactive product exploration, lazy-loaded on demand (Port 3007).
 
-## 🚀 Key Technical Highlights
+## Key Technical Features
 
-*   **Webpack Module Federation (MFE)**: True isolated development environments.
-*   **Decoupled Communication**: Employs Global Event Bus via `window.dispatchEvent(new CustomEvent())` for seamless cross-app interactions (e.g., clicking "Add to cart" in `product-app` instantly updates the state in `cart-app`) without relying on a bulky shared store like Redux.
-*   **React Suspense**: Remote components are dynamically fetched asynchronously over the network with elegant loading states.
-*   **Singleton Dependencies**: `react` and `react-dom` are rigorously configured as `singleton: true` across all Webpack configs to prevent hook collision errors and drastically minimize total network transfer load.
-*   **Optimized Dockerization**: Each app operates via a multi-stage Docker build, generating a production-optimized package served by an ultra-light **Nginx Alpine** server.
+### Monorepo and Build System
+- **Turborepo Management**: Orchestrates build, lint, and start commands across all packages with high-performance caching.
+- **TypeScript Integration**: Full end-to-end type safety from the Backend API (Node.js) through the Store App utility layer to the Frontend components.
+- **Shared Configuration**: Unified ESLint and Prettier rules defined in `packages/config` to ensure code consistency across all micro-frontends.
 
-## 🛠️ Tech Stack
+### Advanced Capabilities
+- **Module Federation (MFE)**: True isolation of development environments with dynamic remote URL loading via runtime configuration.
+- **Real-time Synchronization**: Socket.io integration for instant price updates, flash sale countdowns, and cross-device cart syncing.
+- **State Management**: Centralized store patterns using Zustand, accessible across different micro-frontends via the Store App.
+- **Internationalization (i18n)**: Instant system-wide language switching (English/Vietnamese) without page reloads.
+- **Error Tracking**: Full-stack observability with Sentry integrated into both the App Shell and the Backend API.
+- **PWA and Offline Support**: Service Worker integration using Workbox to ensure fast load times and basic offline functionality.
 
-- **Frontend Core**: React 19, JavaScript (ES6+ JSX)
-- **Bundler & Compiler**: Webpack 5, Babel
-- **Containerization**: Docker, Docker Compose, Nginx
-- **CI/CD Automation**: GitHub Actions (Matrix Pipeline)
-- **Hosting**: Docker Hub Registry + Render Web Services
+### Performance and DevOps
+- **Multi-stage Docker Builds**: Optimized Docker images using Alpine Linux and Nginx to minimize deployment footprint and speed up cold starts.
+- **CI/CD Pipeline**: Automated GitHub Actions workflow utilizing matrix strategies for concurrent building and deployment of all ecosystem apps.
+- **Dynamic Optimization**: Code splitting and lazy loading of heavy modules (like the 3D Engine) to maintain high Lighthouse scores.
 
-## 🏃‍♂️ Running Locally
+## Getting Started
 
-### Option 1: Using Docker Compose (Production Build Simulation)
-Ensure Docker Desktop is open. In the root directory, run:
+### Prerequisites
+- Node.js (v18 or higher)
+- Docker Desktop (for containerized environment)
+
+### Local Development (Live Mode)
+To start all applications simultaneously using Turborepo, run the following in the root directory:
+```bash
+npm install
+npm run dev
+```
+The application will be available at `http://localhost:3000`.
+
+### Production Simulation (Docker)
+To build and run the entire ecosystem locally using Docker Compose:
 ```bash
 docker-compose up -d --build
 ```
-Navigate to `http://localhost:3000` to view the fully integrated app. Containers are mapped precisely to their designated output ports.
 
-### Option 2: Using Node/NPM (Live Development Mode)
-Run each application's Webpack Dev Server in a separate terminal:
-```bash
-cd header-app && npm start
-cd product-app && npm start
-cd cart-app && npm start
-cd admin-app && npm start
-cd container && npm start
-```
-After successful compilation, head over to `http://localhost:3000`.
+## Documentation
+- **UI Components**: Run `npm run storybook` in the `design-system-app` directory to view the interactive documentation for shared components.
+- **API Models**: Shared data interfaces are centrally defined in `packages/types`.
 
-## 🌐 Complete CI/CD Pipeline
-
-The `.github/workflows/ci-cd.yml` maintains a professional deployment cycle:
-1. Pushing/Merging code into `main` automatically fires off GitHub Actions.
-2. A Matrix Strategy fires 5 runners synchronously to build all 5 sub-apps at blistering speeds.
-3. Multi-stage Docker images are pushed directly to Docker Hub (`username/stuffy-[app-name]:latest`).
-4. (Optional) Webhook triggers prompt **Render.com** to pull the latest images and refresh the website with zero downtime.
+## Security and Best Practices
+- **Cookie-based Auth**: Utilizes HttpOnly cookies for secure authentication handling.
+- **Content Security**: Implements skeletal loading and error boundaries to ensure a resilient user experience during network instability.
