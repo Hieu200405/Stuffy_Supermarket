@@ -30,6 +30,7 @@ module.exports = {
       exposes: {
         "./store": "./src/store",
         "./api": "./src/api",
+        "./i18n": "./src/i18n",
       },
       shared: {
         react: { singleton: true, requiredVersion: false },
