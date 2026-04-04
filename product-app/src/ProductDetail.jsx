@@ -3,6 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useCartStore, useWishlistStore } from "store/store";
 import Button from "design_system/Button";
 
+// Lazy-load the 3D viewer (2MB+) — only fetched when user clicks "View in 3D"
+const Viewer3D = React.lazy(() => import("viewer/Viewer"));
+
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -13,10 +16,23 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [similarProducts, setSimilarProducts] = useState([]);
   
+  // Customization State
+  const [selectedColor, setSelectedColor] = useState("#6366f1");
+  const [show3DViewer, setShow3DViewer] = useState(false);
+
   // Review Formulation State
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [submitError, setSubmitError] = useState("");
+
+  const colors = [
+    { name: 'Indigo', value: '#6366f1' },
+    { name: 'Rose', value: '#fb7185' },
+    { name: 'Emerald', value: '#10b981' },
+    { name: 'Amber', value: '#f59e0b' },
+    { name: 'Sky', value: '#38bdf8' },
+    { name: 'Slate', value: '#475569' }
+  ];
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -125,12 +141,46 @@ export default function ProductDetail() {
             ${product.price}
           </div>
 
-          <p style={{ color: 'var(--text-muted)', lineHeight: '1.8', fontSize: '1.05rem', marginBottom: '40px' }}>
+          <p style={{ color: 'var(--text-muted)', lineHeight: '1.8', fontSize: '1.05rem', marginBottom: '30px' }}>
             {product.description}
           </p>
 
+          <div style={{ marginBottom: '40px' }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Custom Accent Color</h4>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              {colors.map(color => (
+                <button
+                  key={color.value}
+                  onClick={() => setSelectedColor(color.value)}
+                  title={color.name}
+                  style={{
+                    width: '38px', height: '38px', borderRadius: '50%',
+                    background: color.value, cursor: 'pointer',
+                    border: selectedColor === color.value ? '3px solid white' : 'none',
+                    boxShadow: selectedColor === color.value ? `0 0 0 2px ${color.value}` : '0 4px 6px rgba(0,0,0,0.1)',
+                    transition: 'all 0.2s transform',
+                    transform: selectedColor === color.value ? 'scale(1.1)' : 'scale(1)'
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '30px' }}>
+            <button 
+              onClick={() => setShow3DViewer(true)} 
+              style={{ padding: '12px 24px', borderRadius: '12px', background: '#f8fafc', border: '1.5px solid var(--border-light)', cursor: 'pointer', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1rem', color: 'var(--text-main)', transition: 'all 0.2s' }}
+              onMouseOver={e=>e.currentTarget.style.background='#f1f5f9'} onMouseOut={e=>e.currentTarget.style.background='#f8fafc'}
+            >
+              <span style={{ fontSize: '1.3rem' }}>🧊</span> View in 3D AR Mode
+            </button>
+          </div>
+
           <div style={{ marginTop: 'auto', display: 'flex', gap: '15px' }}>
-            <Button onClick={() => addToCart(product)} style={{ flex: 1, padding: '18px', fontSize: '1.1rem', borderRadius: '12px' }}>
+            <Button onClick={() => {
+              addToCart(product);
+              window.dispatchEvent(new CustomEvent('STUFFY_TOAST', { detail: { message: `Added ${product.name} to cart!` } }));
+            }} style={{ flex: 1, padding: '18px', fontSize: '1.1rem', borderRadius: '12px' }}>
               Add to Cart
             </Button>
             <button 
@@ -238,6 +288,17 @@ export default function ProductDetail() {
             ))}
           </div>
         </div>
+      )}
+      
+      {show3DViewer && (
+        <React.Suspense fallback={<div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', zIndex: 99999, display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white' }}>Loading 3D...</div>}>
+          <Viewer3D 
+            color={selectedColor} 
+            image={product.image} 
+            name={product.name} 
+            onClose={() => setShow3DViewer(false)} 
+          />
+        </React.Suspense>
       )}
     </div>
   );
