@@ -1,6 +1,7 @@
 import React from 'react';
 import AISearchBar from './AISearchBar';
 import NotificationBell from './NotificationBell';
+import SimpleSearchBar from './SimpleSearchBar';
 
 export default function Header() {
   return (
@@ -11,19 +12,24 @@ export default function Header() {
       position: 'sticky',
       top: 0,
       zIndex: 1000,
-      padding: '15px 40px',
+      padding: '12px 40px',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
       boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.03)'
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ width: '45px', height: '45px', background: 'var(--primary-color)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '900', fontSize: '1.4rem' }}>
-          S
+      <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '45px', height: '45px', background: 'var(--primary-color)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '900', fontSize: '1.4rem' }}>
+            S
+          </div>
+          <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '800', letterSpacing: '-0.5px', color: 'var(--text-main)' }}>
+            Stuffy<span style={{ color: 'var(--secondary-color)' }}>Store</span>
+          </h1>
         </div>
-        <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '800', letterSpacing: '-0.5px', color: 'var(--text-main)' }}>
-          Stuffy<span style={{ color: 'var(--secondary-color)' }}>Store</span>
-        </h1>
+
+        {/* 🔍 Thanh Tìm Kiếm Standard (Real-time) */}
+        <SimpleSearchBar />
       </div>
 
       {/* 🤖 Thanh Tìm Kiếm AI thay thế ô search tĩnh */}

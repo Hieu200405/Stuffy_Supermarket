@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCartStore, useWishlistStore } from "store/store";
+import { productApi } from "store/api";
 import Button from "design_system/Button";
 import ProductSkeleton from "design_system/ProductSkeleton";
 import { io } from "socket.io-client";
@@ -25,31 +26,30 @@ export default function ProductList() {
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [category, setCategory] = useState("All");
+  const [keyword, setKeyword] = useState("");
 
   const categories = ["All", "Laptops", "Phones", "Audio", "Gaming", "Video", "Accessories"];
 
-  const fetchProducts = () => {
+  const fetchProducts = async () => {
     setLoading(true);
-    fetch(`https://stuffy-backend-api.onrender.com/api/products?pageNumber=${page}&category=${category}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.products) {
-          setProducts(data.products);
-          setPages(data.pages);
-        } else {
-          setProducts(Array.isArray(data) ? data : []);
-        }
-        setLoading(false);
-      })
-      .catch(err => { 
-        console.error('[ProductList] Failed to fetch products:', err.message); 
-        setLoading(false); 
-      });
+    try {
+      const data = await productApi.getAll(keyword, page, category);
+      if (data && data.products) {
+        setProducts(data.products);
+        setPages(data.pages);
+      } else {
+        setProducts(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error('[ProductList] Failed to fetch products:', err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchProducts();
-  }, [page, category]);
+  }, [page, category, keyword]);
 
   useEffect(() => {
     socket.on("PRICE_UPDATED", (updatedProduct) => {
@@ -67,13 +67,20 @@ export default function ProductList() {
     socket.on("PRODUCT_DELETED", (id) => setProducts((current) => current.filter(p => p.id !== id)));
 
     const handleAIResult = (e) => setAiMatches(e.detail.matches);
+    const handleProductSearch = (e) => {
+      setKeyword(e.detail.keyword);
+      setPage(1); // Quay về trang 1 khi search
+    };
+
     window.addEventListener('AI_SEARCH_RESULT', handleAIResult);
+    window.addEventListener('PRODUCT_SEARCH', handleProductSearch);
     
     return () => {
       socket.off("PRICE_UPDATED");
       socket.off("NEW_PRODUCT");
       socket.off("PRODUCT_DELETED");
       window.removeEventListener('AI_SEARCH_RESULT', handleAIResult);
+      window.removeEventListener('PRODUCT_SEARCH', handleProductSearch);
     };
   }, [category]);
 
