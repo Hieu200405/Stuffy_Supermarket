@@ -1,18 +1,13 @@
 import { create } from "zustand";
 
 const syncToServer = async (cartItems) => {
-  const userInfoString = localStorage.getItem('userInfo');
-  if (!userInfoString) return;
   try {
-    const { token } = JSON.parse(userInfoString);
-    if (!token) return;
-    
     await fetch("https://stuffy-backend-api.onrender.com/api/cart", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
       },
+      credentials: 'include',
       body: JSON.stringify({ cartItems })
     });
   } catch (e) {
@@ -24,13 +19,9 @@ export const useCartStore = create((set, get) => ({
   cartItems: [],
   
   loadCartFromServer: async () => {
-    const userInfoString = localStorage.getItem('userInfo');
-    if (!userInfoString) return;
     try {
-      const { token } = JSON.parse(userInfoString);
-      if (!token) return;
       const res = await fetch("https://stuffy-backend-api.onrender.com/api/cart", {
-        headers: { "Authorization": `Bearer ${token}` }
+        credentials: 'include'
       });
       if (res.ok) {
         const data = await res.json();

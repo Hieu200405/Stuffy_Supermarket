@@ -8,11 +8,24 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userInfo = localStorage.getItem('userInfo');
-      if (userInfo) {
-        setUser(JSON.parse(userInfo));
+      try {
+        const userInfo = localStorage.getItem('userInfo'); // We still keep basic non-sensitive info local if we want, OR just rely on /me
+        const res = await fetch("https://stuffy-backend-api.onrender.com/api/auth/me", {
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+          localStorage.setItem('userInfo', JSON.stringify(data));
+        } else {
+          setUser(null);
+          localStorage.removeItem('userInfo');
+        }
+      } catch (e) {
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchUser();
   }, []);
@@ -23,6 +36,7 @@ export const AuthProvider = ({ children }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: 'include'
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -41,6 +55,7 @@ export const AuthProvider = ({ children }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
+        credentials: 'include'
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -53,7 +68,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch("https://stuffy-backend-api.onrender.com/api/auth/logout", {
+        method: "POST",
+        credentials: 'include'
+      });
+    } catch (e) {}
     setUser(null);
     localStorage.removeItem('userInfo');
   };
