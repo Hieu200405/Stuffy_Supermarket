@@ -36,7 +36,7 @@ export const authApi = {
 };
 
 export const productApi = {
-  getAll: (keyword = '', page = 1) => apiRequest(`/products?keyword=${keyword}&pageNumber=${page}`),
+  getAll: (keyword = '', page = 1, category = 'All') => apiRequest(`/products?keyword=${keyword}&pageNumber=${page}&category=${category}`),
   getById: (id) => apiRequest(`/products/${id}`),
   create: (product) => apiRequest('/products', {
     method: 'POST',
