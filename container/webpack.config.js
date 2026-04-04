@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = require("webpack").container;
+const { GenerateSW } = require('workbox-webpack-plugin');
 const webpack = require("webpack");
 require("dotenv").config();
 
@@ -87,6 +88,31 @@ module.exports = {
 
     new HtmlWebpackPlugin({
       template: "./public/index.html",
+    }),
+
+    // PWA: Generate Service Worker
+    new GenerateSW({
+      clientsClaim: true,
+      skipWaiting: true,
+      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+      runtimeCaching: [
+        {
+          urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'images',
+            expiration: { maxEntries: 50 },
+          },
+        },
+        {
+          urlPattern: /https:\/\/stuffy-backend-api.onrender.com\/api/,
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'api-cache',
+            networkTimeoutSeconds: 10,
+          },
+        }
+      ]
     }),
   ],
 };
