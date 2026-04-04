@@ -52,6 +52,7 @@ module.exports = {
         viewer: `viewer@${getUrl('VIEWER_URL', 'https://stuffy-3d-viewer-app.onrender.com')}/remoteEntry.js`,
         profile: `profile@${getUrl('PROFILE_URL', 'https://stuffy-profile-app.onrender.com')}/remoteEntry.js`,
         marketing: `marketing@${getUrl('MARKETING_URL', 'https://stuffy-marketing-app.onrender.com')}/remoteEntry.js`,
+        support: `support@${getUrl('SUPPORT_URL', 'https://stuffy-support-app.onrender.com')}/remoteEntry.js`,
       },
 
       shared: {
