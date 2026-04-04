@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCartStore, useWishlistStore } from "store/store";
 import Button from "design_system/Button";
+import ProductSkeleton from "design_system/ProductSkeleton";
 import { io } from "socket.io-client";
 
 // Lazy-load the 3D viewer (2MB+) — only fetched when user clicks "View in 3D"
@@ -145,7 +146,9 @@ export default function ProductList() {
         )}
 
         {loading ? (
-          <div style={{ color: "var(--text-muted)", fontSize: '1.1rem', textAlign: 'center', padding: '80px 0' }}>Loading products...</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "30px" }}>
+            {[...Array(8)].map((_, i) => <ProductSkeleton key={i} />)}
+          </div>
         ) : products.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0', border: '2px dashed var(--border-light)', borderRadius: '16px', background: '#f8fafc' }}>
             <h3 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.4rem' }}>No products found</h3>

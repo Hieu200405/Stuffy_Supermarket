@@ -30,6 +30,7 @@ module.exports = {
       exposes: {
         "./Button": "./src/components/Button",
         "./GlassCard": "./src/components/GlassCard",
+        "./ProductSkeleton": "./src/components/ProductSkeleton",
         "./styles": "./src/index.css"
       },
       shared: {

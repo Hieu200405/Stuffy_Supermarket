@@ -88,3 +88,26 @@ body {
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
+
+/* Premium Skeleton Loading */
+.ds-skeleton {
+  background-color: #f1f5f9;
+  background-image: linear-gradient(
+    90deg, 
+    #f1f5f9 0px, 
+    #f8fafc 40px, 
+    #f1f5f9 80px
+  );
+  background-size: 600px;
+  animation: ds-shimmer 2s infinite linear;
+  border-radius: 8px;
+}
+
+@keyframes ds-shimmer {
+  0% {
+    background-position: -600px;
+  }
+  100% {
+    background-position: 600px;
+  }
+}
