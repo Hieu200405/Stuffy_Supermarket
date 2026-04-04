@@ -1,13 +1,25 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Schema } from 'mongoose';
+import { Product as SharedProduct } from '@stuffy/types';
 
-const reviewSchema = new mongoose.Schema({
+export interface IReview extends Document {
+  name: string;
+  rating: number;
+  comment: string;
+  user: mongoose.Schema.Types.ObjectId;
+}
+
+const reviewSchema = new Schema<IReview>({
   name: { type: String, required: true },
   rating: { type: Number, required: true },
   comment: { type: String, required: true },
-  user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+  user: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
 }, { timestamps: true });
 
-const ProductSchema = new mongoose.Schema({
+export interface IProduct extends Document, Omit<SharedProduct, 'id'> {
+  _id: mongoose.Types.ObjectId;
+}
+
+const ProductSchema = new Schema<IProduct>({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   description: { type: String, default: "A really great tech product." },
@@ -18,4 +30,4 @@ const ProductSchema = new mongoose.Schema({
   reviews: [reviewSchema]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Product', ProductSchema);
+export default mongoose.model<IProduct>('Product', ProductSchema);

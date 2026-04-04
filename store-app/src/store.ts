@@ -1,7 +1,18 @@
 import { create } from "zustand";
 import { cartApi } from "./api";
+import { Product, CartItem } from "@stuffy/types";
 
-const syncToServer = async (cartItems) => {
+interface CartState {
+  cartItems: CartItem[];
+  loadCartFromServer: () => Promise<void>;
+  addToCart: (product: Product) => void;
+  removeFromCart: (id: string) => void;
+  increaseQuantity: (id: string) => void;
+  decreaseQuantity: (id: string) => void;
+  clearCart: () => void;
+}
+
+const syncToServer = async (cartItems: CartItem[]) => {
   try {
     await cartApi.syncCart(cartItems);
   } catch (e) {
@@ -9,21 +20,21 @@ const syncToServer = async (cartItems) => {
   }
 };
 
-export const useCartStore = create((set, get) => ({
+export const useCartStore = create<CartState>((set, get) => ({
   cartItems: [],
   
   loadCartFromServer: async () => {
     try {
       const data = await cartApi.getCart();
-      set({ cartItems: data });
+      set({ cartItems: data.cartItems as CartItem[] });
     } catch (e) {
       console.error("Failed to load cart", e);
     }
   },
 
-  addToCart: (product) => set((state) => {
+  addToCart: (product: Product) => set((state) => {
     const existing = state.cartItems.find(i => i.id === product.id);
-    let newItems;
+    let newItems: CartItem[];
     if (existing) {
       newItems = state.cartItems.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
     } else {
@@ -33,20 +44,20 @@ export const useCartStore = create((set, get) => ({
     return { cartItems: newItems };
   }),
 
-  removeFromCart: (id) => set((state) => {
+  removeFromCart: (id: string) => set((state) => {
     const newItems = state.cartItems.filter(i => i.id !== id);
     syncToServer(newItems);
     return { cartItems: newItems };
   }),
 
-  increaseQuantity: (id) => set((state) => {
-    const newItems = state.cartItems.map(i => i.id === id ? { ...i, quantity: i.quantity + 1 } : i);
+  increaseQuantity: (id: string) => set((state) => {
+    const newItems = state.cartItems.map(i => i.id === id ? { ...i, quantity: i.quantity + 1 } : i) as CartItem[];
     syncToServer(newItems);
     return { cartItems: newItems };
   }),
 
-  decreaseQuantity: (id) => set((state) => {
-    const newItems = state.cartItems.map(i => i.id === id && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i);
+  decreaseQuantity: (id: string) => set((state) => {
+    const newItems = state.cartItems.map(i => i.id === id && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i) as CartItem[];
     syncToServer(newItems);
     return { cartItems: newItems };
   }),
@@ -57,10 +68,16 @@ export const useCartStore = create((set, get) => ({
   })
 }));
 
-export const useWishlistStore = create((set) => ({
-  wishlist: JSON.parse(localStorage.getItem('stuffy_wishlist')) || [],
+interface WishlistState {
+  wishlist: Product[];
+  toggleWishlist: (product: Product) => void;
+  isInWishlist: (id: string) => boolean;
+}
+
+export const useWishlistStore = create<WishlistState>((set, get) => ({
+  wishlist: JSON.parse(localStorage.getItem('stuffy_wishlist') || '[]'),
   
-  toggleWishlist: (product) => set((state) => {
+  toggleWishlist: (product: Product) => set((state) => {
     const exists = state.wishlist.find(i => i.id === product.id);
     let newList;
     if (exists) {
@@ -72,5 +89,7 @@ export const useWishlistStore = create((set) => ({
     return { wishlist: newList };
   }),
 
-  isInWishlist: (id) => false // We let components read from state.wishlist array
+  isInWishlist: (id: string) => {
+    return !!get().wishlist.find(i => i.id === id);
+  }
 }));
