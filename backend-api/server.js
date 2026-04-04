@@ -43,6 +43,13 @@ io.on('connection', (socket) => {
   });
 });
 
+// Flash Sale Real-time Sync
+let flashSaleTimeLeft = 24 * 60 * 60; // 24 hours
+setInterval(() => {
+  flashSaleTimeLeft = flashSaleTimeLeft > 0 ? flashSaleTimeLeft - 1 : 24 * 60 * 60;
+  io.emit('FLASH_SALE_TICK', flashSaleTimeLeft);
+}, 1000);
+
 const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/stuffy_db';
 
 mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 })
