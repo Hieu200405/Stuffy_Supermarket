@@ -28,6 +28,7 @@ module.exports = {
       filename: "remoteEntry.js",
       exposes: {
         "./store": "./src/store",
+        "./api": "./src/api",
       },
       shared: {
         react: { singleton: true, requiredVersion: false },
