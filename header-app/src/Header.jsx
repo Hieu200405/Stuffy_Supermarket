@@ -1,5 +1,6 @@
 import React from 'react';
 import AISearchBar from './AISearchBar';
+import NotificationBell from './NotificationBell';
 
 export default function Header() {
   return (
@@ -28,9 +29,13 @@ export default function Header() {
       {/* 🤖 Thanh Tìm Kiếm AI thay thế ô search tĩnh */}
       <AISearchBar />
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
         <span style={{ fontWeight: '600', color: 'var(--text-muted)', cursor: 'pointer' }}>Support</span>
-        <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#ffedd5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: '#ea580c', border: '2px solid white', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>NV</div>
+        
+        {/* Notification Bell Component */}
+        <NotificationBell />
+        
+        <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#ffedd5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: '#ea580c', border: '2px solid white', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginLeft: '10px' }}>NV</div>
       </div>
     </header>
   );
