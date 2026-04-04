@@ -1,15 +1,9 @@
 import { create } from "zustand";
+import { cartApi } from "./api";
 
 const syncToServer = async (cartItems) => {
   try {
-    await fetch("https://stuffy-backend-api.onrender.com/api/cart", {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-      },
-      credentials: 'include',
-      body: JSON.stringify({ cartItems })
-    });
+    await cartApi.syncCart(cartItems);
   } catch (e) {
     console.error("Failed to sync cart", e);
   }
@@ -20,13 +14,8 @@ export const useCartStore = create((set, get) => ({
   
   loadCartFromServer: async () => {
     try {
-      const res = await fetch("https://stuffy-backend-api.onrender.com/api/cart", {
-        credentials: 'include'
-      });
-      if (res.ok) {
-        const data = await res.json();
-        set({ cartItems: data });
-      }
+      const data = await cartApi.getCart();
+      set({ cartItems: data });
     } catch (e) {
       console.error("Failed to load cart", e);
     }

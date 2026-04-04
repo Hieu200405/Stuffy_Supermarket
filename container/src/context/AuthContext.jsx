@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { authApi } from "store/api";
 
 const AuthContext = createContext();
 
@@ -9,20 +10,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userInfo = localStorage.getItem('userInfo'); // We still keep basic non-sensitive info local if we want, OR just rely on /me
-        const res = await fetch("https://stuffy-backend-api.onrender.com/api/auth/me", {
-          credentials: 'include'
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-          localStorage.setItem('userInfo', JSON.stringify(data));
-        } else {
-          setUser(null);
-          localStorage.removeItem('userInfo');
-        }
+        const data = await authApi.me();
+        setUser(data);
+        localStorage.setItem('userInfo', JSON.stringify(data));
       } catch (e) {
         setUser(null);
+        localStorage.removeItem('userInfo');
       } finally {
         setLoading(false);
       }
@@ -32,15 +25,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await fetch("https://stuffy-backend-api.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include'
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      
+      const data = await authApi.login(email, password);
       setUser(data);
       localStorage.setItem('userInfo', JSON.stringify(data));
       return { success: true };
@@ -51,15 +36,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      const res = await fetch("https://stuffy-backend-api.onrender.com/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-        credentials: 'include'
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      
+      const data = await authApi.register(name, email, password);
       setUser(data);
       localStorage.setItem('userInfo', JSON.stringify(data));
       return { success: true };
@@ -70,10 +47,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch("https://stuffy-backend-api.onrender.com/api/auth/logout", {
-        method: "POST",
-        credentials: 'include'
-      });
+      await authApi.logout();
     } catch (e) {}
     setUser(null);
     localStorage.removeItem('userInfo');
