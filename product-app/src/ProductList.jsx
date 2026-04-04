@@ -5,6 +5,8 @@ import { productApi } from "store/api";
 import Button from "design_system/Button";
 import ProductSkeleton from "design_system/ProductSkeleton";
 import { io } from "socket.io-client";
+// @ts-ignore
+import { useI18nStore } from "store/i18n";
 
 // Lazy-load the 3D viewer (2MB+) — only fetched when user clicks "View in 3D"
 const Viewer3D = React.lazy(() => import("viewer/Viewer"));
@@ -12,6 +14,7 @@ const Viewer3D = React.lazy(() => import("viewer/Viewer"));
 const socket = io("https://stuffy-backend-api.onrender.com");
 
 export default function ProductList() {
+  const { t } = useI18nStore();
   const navigate = useNavigate();
   const addToCart = useCartStore((state) => state.addToCart);
   const { wishlist, toggleWishlist } = useWishlistStore();
@@ -101,7 +104,7 @@ export default function ProductList() {
       
       {/* CỘT TRÁI: DANH MỤC LỘNG LẪY */}
       <aside style={{ width: '250px', flexShrink: 0, position: 'sticky', top: '40px' }}>
-        <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 20px 0', color: 'var(--text-main)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Categories</h3>
+        <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 20px 0', color: 'var(--text-main)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>{t('category')}</h3>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {categories.map((cat) => (
             <li key={cat}>
@@ -220,7 +223,7 @@ export default function ProductList() {
                           detail: { message: `Added ${p.name} to cart!`, type: 'success' } 
                         }));
                       }} style={{ background: isFlashing ? "#ef4444" : "var(--primary-color)" }}>
-                        {isFlashing ? 'Add Now' : 'Add to Cart'}
+                        {isFlashing ? 'Add Now' : t('add_to_cart')}
                       </Button>
                     </div>
                   </div>

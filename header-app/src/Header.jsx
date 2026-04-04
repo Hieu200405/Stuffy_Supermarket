@@ -2,6 +2,7 @@ import React from 'react';
 import AISearchBar from './AISearchBar';
 import NotificationBell from './NotificationBell';
 import SimpleSearchBar from './SimpleSearchBar';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header() {
   return (
@@ -40,6 +41,9 @@ export default function Header() {
         
         {/* Notification Bell Component */}
         <NotificationBell />
+        
+        {/* Sync i18n Switcher */}
+        <LanguageSwitcher />
         
         <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#ffedd5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: '#ea580c', border: '2px solid white', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginLeft: '10px' }}>NV</div>
       </div>
