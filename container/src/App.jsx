@@ -15,6 +15,7 @@ const Admin = React.lazy(() => import("admin/App"));
 const UserProfile = React.lazy(() => import("profile/UserProfile"));
 const FlashSaleBanner = React.lazy(() => import("marketing/FlashSaleBanner"));
 const VoucherWallet = React.lazy(() => import("marketing/VoucherWallet"));
+const FloatingChat = React.lazy(() => import("support/FloatingChat"));
 
 const ProtectedModule = ({ children, moduleName }) => (
   <ErrorBoundary>
@@ -107,6 +108,9 @@ export default function App() {
             <Route path="/scanner/:sessionCode" element={<MobileScanner />} />
           </Routes>
         </main>
+        
+        {/* Support AI Chat (MFE Phase 5) */}
+        <ProtectedModule moduleName="Support Chat"><FloatingChat /></ProtectedModule>
       </div>
     </BrowserRouter>
     </AuthProvider>
