@@ -214,7 +214,12 @@ export default function ProductList() {
                       <span style={{ margin: 0, fontWeight: "800", fontSize: isFlashing ? "1.8rem" : "1.5rem", color: isFlashing ? "#ef4444" : "var(--primary-color)", transition: "all 0.3s" }}>
                         ${p.price}
                       </span>
-                      <Button onClick={() => addToCart(p)} style={{ background: isFlashing ? "#ef4444" : "var(--primary-color)" }}>
+                      <Button onClick={() => {
+                        addToCart(p);
+                        window.dispatchEvent(new CustomEvent('STUFFY_TOAST', { 
+                          detail: { message: `Added ${p.name} to cart!`, type: 'success' } 
+                        }));
+                      }} style={{ background: isFlashing ? "#ef4444" : "var(--primary-color)" }}>
                         {isFlashing ? 'Add Now' : 'Add to Cart'}
                       </Button>
                     </div>
