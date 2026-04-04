@@ -1,7 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Container</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stuffy Supermarket - Micro Frontends</title>
+  <script>
+    // Khởi tạo config từ file JSON tại runtime
+    // Điều này cho phép thay đổi URL của các MFE mà không cần build lại Container
+    (function() {
+      window._STUFFY_CONFIG_ = null;
+      fetch('/config.json')
+        .then(res => res.json())
+        .then(config => {
+          window._STUFFY_CONFIG_ = config;
+        })
+        .catch(err => {
+          console.error('Không thể nạp config.json:', err);
+          // Fallback object để tránh lỗi undefined
+          window._STUFFY_CONFIG_ = {};
+        });
+    })();
+  </script>
 </head>
 <body>
   <div id="root"></div>

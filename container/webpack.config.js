@@ -4,7 +4,29 @@ const webpack = require("webpack");
 require("dotenv").config();
 
 // Auto-detect environment: use .env for local dev, fall back to process.env for Render deployment
-const getUrl = (envVar, defaultUrl) => process.env[envVar] || defaultUrl;
+// Helper to generate dynamic remote promise for Webpack Module Federation
+const dynamicRemote = (name, envVar, defaultUrl) => `
+  promise new Promise((resolve) => {
+    const fetchConfig = () => {
+      if (window._STUFFY_CONFIG_) {
+        const url = window._STUFFY_CONFIG_['${envVar}'] || '${defaultUrl}';
+        const script = document.createElement('script');
+        script.src = \`\${url}/remoteEntry.js\`;
+        script.onload = () => {
+          resolve({
+            get: (request) => window.${name}.get(request),
+            init: (arg) => window.${name}.init(arg),
+          });
+        };
+        document.head.appendChild(script);
+      } else {
+        // Wait for index.html to finish fetching config.json
+        setTimeout(fetchConfig, 10);
+      }
+    };
+    fetchConfig();
+  })
+`;
 
 module.exports = {
   mode: "development",
@@ -43,16 +65,16 @@ module.exports = {
       name: "container",
 
       remotes: {
-        header: `header@${getUrl('HEADER_URL', 'https://stuffy-header-app.onrender.com')}/remoteEntry.js`,
-        product: `product@${getUrl('PRODUCT_URL', 'https://stuffy-product-app.onrender.com')}/remoteEntry.js`,
-        cart: `cart@${getUrl('CART_URL', 'https://stuffy-cart-app.onrender.com')}/remoteEntry.js`,
-        admin: `admin@${getUrl('ADMIN_URL', 'https://stuffy-admin-app.onrender.com')}/remoteEntry.js`,
-        store: `store@${getUrl('STORE_URL', 'https://stuffy-store-app.onrender.com')}/remoteEntry.js`,
-        design_system: `design_system@${getUrl('DESIGN_SYSTEM_URL', 'https://stuffy-design-system-app.onrender.com')}/remoteEntry.js`,
-        viewer: `viewer@${getUrl('VIEWER_URL', 'https://stuffy-3d-viewer-app.onrender.com')}/remoteEntry.js`,
-        profile: `profile@${getUrl('PROFILE_URL', 'https://stuffy-profile-app.onrender.com')}/remoteEntry.js`,
-        marketing: `marketing@${getUrl('MARKETING_URL', 'https://stuffy-marketing-app.onrender.com')}/remoteEntry.js`,
-        support: `support@${getUrl('SUPPORT_URL', 'https://stuffy-support-app.onrender.com')}/remoteEntry.js`,
+        header: dynamicRemote("header", "HEADER_URL", "https://stuffy-header-app.onrender.com"),
+        product: dynamicRemote("product", "PRODUCT_URL", "https://stuffy-product-app.onrender.com"),
+        cart: dynamicRemote("cart", "CART_URL", "https://stuffy-cart-app.onrender.com"),
+        admin: dynamicRemote("admin", "ADMIN_URL", "https://stuffy-admin-app.onrender.com"),
+        store: dynamicRemote("store", "STORE_URL", "https://stuffy-store-app.onrender.com"),
+        design_system: dynamicRemote("design_system", "DESIGN_SYSTEM_URL", "https://stuffy-design-system-app.onrender.com"),
+        viewer: dynamicRemote("viewer", "VIEWER_URL", "https://stuffy-3d-viewer-app.onrender.com"),
+        profile: dynamicRemote("profile", "PROFILE_URL", "https://stuffy-profile-app.onrender.com"),
+        marketing: dynamicRemote("marketing", "MARKETING_URL", "https://stuffy-marketing-app.onrender.com"),
+        support: dynamicRemote("support", "SUPPORT_URL", "https://stuffy-support-app.onrender.com"),
       },
 
       shared: {
