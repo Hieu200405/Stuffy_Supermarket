@@ -1,0 +1,20 @@
+{
+  "name": "stuffy-supermarket-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "start": "turbo start",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "clean": "turbo clean"
+  },
+  "workspaces": [
+    "container",
+    "backend-api",
+    "*-app"
+  ],
+  "devDependencies": {
+    "turbo": "^2.9.3"
+  },
+  "packageManager": "npm@10.0.0"
+}
