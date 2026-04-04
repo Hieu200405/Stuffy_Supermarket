@@ -52,14 +52,19 @@ module.exports = {
         resolve: { fullySpecified: false },
       },
       {
-        test: /\.jsx?$/,
+        test: /\.(js|jsx)$/,
         use: "babel-loader",
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.(ts|tsx)$/,
+        loader: "ts-loader",
         exclude: /node_modules/,
       },
     ],
   },
 
-  resolve: { extensions: [".js", ".jsx"] },
+  resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
 
   plugins: [
     new ModuleFederationPlugin({
