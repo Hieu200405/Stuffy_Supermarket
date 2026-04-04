@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { io } from "socket.io-client";
 
 export default function FlashSaleBanner() {
-  const [timeLeft, setTimeLeft] = useState(2 * 60 * 60); // 2 hours in seconds
+  const [timeLeft, setTimeLeft] = useState(0); 
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => prev > 0 ? prev - 1 : 0);
-    }, 1000);
-    return () => clearInterval(timer);
+    // Kết nối tới backend socket
+    socketRef.current = io("https://stuffy-backend-api.onrender.com");
+    
+    socketRef.current.on('FLASH_SALE_TICK', (serverTime) => {
+      setTimeLeft(serverTime);
+    });
+
+    return () => {
+      if (socketRef.current) socketRef.current.disconnect();
+    };
   }, []);
 
   const formatTime = (seconds) => {
