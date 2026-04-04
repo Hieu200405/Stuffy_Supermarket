@@ -1,6 +1,9 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "design_system/styles";
+// ... existing imports ...
 import ErrorBoundary from "./components/ErrorBoundary";
 import MobileScanner from "./pages/MobileScanner";
 import Login from "./pages/Login";
@@ -8,6 +11,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Navigate } from "react-router-dom";
 
 const Header = React.lazy(() => import("header/Header"));
+// ... existing lazy imports ...
 const ProductList = React.lazy(() => import("product/ProductList"));
 const ProductDetail = React.lazy(() => import("product/ProductDetail"));
 const Cart = React.lazy(() => import("cart/Cart"));
@@ -73,6 +77,15 @@ const AdminRoute = ({ children }) => {
 };
 
 export default function App() {
+  useEffect(() => {
+    const handleToast = (e) => {
+      const { message, type = 'success' } = e.detail;
+      toast[type](message);
+    };
+    window.addEventListener('STUFFY_TOAST', handleToast);
+    return () => window.removeEventListener('STUFFY_TOAST', handleToast);
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -109,8 +122,8 @@ export default function App() {
           </Routes>
         </main>
         
-        {/* Support AI Chat (MFE Phase 5) */}
         <ProtectedModule moduleName="Support Chat"><FloatingChat /></ProtectedModule>
+        <ToastContainer position="bottom-right" theme="colored" autoClose={3000} />
       </div>
     </BrowserRouter>
     </AuthProvider>
