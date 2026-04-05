@@ -11,6 +11,10 @@ module.exports = {
       { test: /\.m?js$/, type: "javascript/auto", resolve: { fullySpecified: false } },
       { test: /\.jsx?$/, use: "babel-loader", exclude: /node_modules/ },
       { test: /\.css$/, use: ["style-loader", "css-loader"] },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif|glb|gltf|bin)$/i,
+        type: 'asset/resource',
+      },
     ],
   },
   resolve: { extensions: [".js", ".jsx"] },
