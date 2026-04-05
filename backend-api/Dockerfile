@@ -1,13 +1,28 @@
-# Stage 1: Build & Production Dependencies
 FROM node:18-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --omit=dev
 
-# Stage 2: Final Lean Runtime Image
+# Copy shared configs and packages
+COPY package*.json ./
+COPY packages ./packages
+COPY backend-api/package*.json ./backend-api/
+COPY backend-api/tsconfig.json ./backend-api/
+
+# Install root dependencies (including workspaces)
+RUN npm install
+
+# Build the specific app
+COPY backend-api ./backend-api
+WORKDIR /app/backend-api
+RUN npm run build
+
 FROM node:18-alpine
 WORKDIR /app
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/backend-api/package*.json ./backend-api/
+COPY --from=builder /app/backend-api/dist ./backend-api/dist
 COPY --from=builder /app/node_modules ./node_modules
-COPY . .
+
+WORKDIR /app/backend-api
 EXPOSE 5000
-CMD ["node", "server.js"]
+CMD ["node", "dist/server.js"]
