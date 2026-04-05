@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy shared configs and packages
@@ -6,8 +6,8 @@ COPY package*.json ./
 COPY packages ./packages
 COPY header-app/package*.json ./header-app/
 
-# Install root dependencies (including workspaces)
-RUN npm install
+# Install root and header-app dependencies
+RUN npm install --workspace=header-app --include-workspace-root
 
 # Build the specific app
 COPY header-app ./header-app

@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy shared configs and packages
@@ -6,8 +6,8 @@ COPY package*.json ./
 COPY packages ./packages
 COPY design-system-app/package*.json ./design-system-app/
 
-# Install root dependencies (including workspaces)
-RUN npm install
+# Install root and design-system-app dependencies
+RUN npm install --workspace=design-system-app --include-workspace-root
 
 # Build the specific app
 COPY design-system-app ./design-system-app
