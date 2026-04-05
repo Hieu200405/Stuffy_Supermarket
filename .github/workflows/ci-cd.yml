@@ -18,8 +18,16 @@ jobs:
       - name: Tải mã nguồn
         uses: actions/checkout@v3
 
+      - name: Đăng nhập vào GitHub Container Registry (GHCR)
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Đăng nhập vào Docker Hub
-        if: github.event_name != 'pull_request'
+        # Kế hoạch dự phòng: Chỉ login vào Docker Hub nếu branch là main/master
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -28,16 +36,22 @@ jobs:
       - name: Thiết lập Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build và đẩy ảnh (Push Image) lên Docker Hub
+      - name: Build và đẩy ảnh (Push Image)
         uses: docker/build-push-action@v4
         with:
           context: ./${{ matrix.app }}
           file: ./${{ matrix.app }}/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ secrets.DOCKER_USERNAME }}/stuffy-${{ matrix.app }}:latest
-          # Truyền Gemini API Key vào lúc build (chỉ có tác dụng với header-app nhờ ARG trong Dockerfile)
+          # Đẩy lên cả GHCR (Không bao giờ bị giới hạn) và Docker Hub
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/stuffy-${{ matrix.app }}:latest
+            ${{ secrets.DOCKER_USERNAME }}/stuffy-${{ matrix.app }}:latest
+          # Truyền Gemini API Key
           build-args: |
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          # Dùng cache của Github Actions để tránh kéo Image từ Docker Hub quá nhiều lần
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
 
   deploy-to-render:
     needs: build-and-push-dockerhub
