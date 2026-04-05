@@ -2,5 +2,9 @@
   "name": "@stuffy/config",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^7.1.4",
+    "style-loader": "^4.0.0"
+  }
 }

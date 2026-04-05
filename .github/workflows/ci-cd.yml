@@ -44,7 +44,7 @@ jobs:
       - name: Build và đẩy ảnh (Push Image)
         uses: docker/build-push-action@v4
         with:
-          context: ./${{ matrix.app }}
+          context: .
           file: ./${{ matrix.app }}/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           # Đẩy lên cả GHCR (Không bao giờ bị giới hạn) và Docker Hub
