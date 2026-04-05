@@ -12,7 +12,7 @@ RUN npm install
 # Build the specific app
 COPY container ./container
 WORKDIR /app/container
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM nginx:alpine
 COPY --from=builder /app/container/dist /usr/share/nginx/html

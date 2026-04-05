@@ -15,7 +15,7 @@ WORKDIR /app/header-app
 # Nhận API Key từ CI/CD Secret lúc build (--build-arg)
 ARG GEMINI_API_KEY=""
 ENV GEMINI_API_KEY=$GEMINI_API_KEY
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM nginx:alpine
 COPY --from=builder /app/header-app/dist /usr/share/nginx/html

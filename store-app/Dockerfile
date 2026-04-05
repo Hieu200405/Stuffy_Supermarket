@@ -12,7 +12,7 @@ RUN npm install
 # Build the specific app
 COPY store-app ./store-app
 WORKDIR /app/store-app
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM nginx:alpine
 COPY --from=builder /app/store-app/dist /usr/share/nginx/html

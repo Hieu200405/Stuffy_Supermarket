@@ -12,7 +12,7 @@ RUN npm install
 # Build the specific app
 COPY 3d-viewer-app ./3d-viewer-app
 WORKDIR /app/3d-viewer-app
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM nginx:alpine
 COPY --from=builder /app/3d-viewer-app/dist /usr/share/nginx/html
