@@ -12,7 +12,7 @@ RUN npm install
 # Build the specific app
 COPY cart-app ./cart-app
 WORKDIR /app/cart-app
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM nginx:alpine
 COPY --from=builder /app/cart-app/dist /usr/share/nginx/html

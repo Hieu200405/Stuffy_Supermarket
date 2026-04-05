@@ -12,7 +12,7 @@ RUN npm install
 # Build the specific app
 COPY admin-app ./admin-app
 WORKDIR /app/admin-app
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM nginx:alpine
 COPY --from=builder /app/admin-app/dist /usr/share/nginx/html

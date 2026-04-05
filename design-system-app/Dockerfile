@@ -12,7 +12,7 @@ RUN npm install
 # Build the specific app
 COPY design-system-app ./design-system-app
 WORKDIR /app/design-system-app
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM nginx:alpine
 COPY --from=builder /app/design-system-app/dist /usr/share/nginx/html

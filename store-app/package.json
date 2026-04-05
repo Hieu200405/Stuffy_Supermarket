@@ -2,7 +2,8 @@
   "name": "store-app",
   "version": "1.0.0",
   "scripts": {
-    "start": "webpack serve --open"
+    "start": "webpack serve --open",
+    "build": "webpack --mode production"
   },
   "type": "commonjs",
   "dependencies": {
