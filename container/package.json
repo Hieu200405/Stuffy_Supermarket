@@ -36,9 +36,11 @@
     "@stuffy/types": "*",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "css-loader": "^7.1.4",
     "eslint": "^9.0.0",
     "eslint-plugin-react": "^7.34.0",
     "prettier": "^3.2.0",
+    "style-loader": "^4.0.0",
     "ts-loader": "^9.5.0",
     "typescript": "^5.4.0"
   }

@@ -18,7 +18,8 @@ module.exports = {
     rules: [
       { test: /\.m?js$/, type: "javascript/auto", resolve: { fullySpecified: false } },
       { test: /\.(js|jsx)$/, use: "babel-loader", exclude: /node_modules/ },
-      { test: /\.(ts|tsx)$/, loader: "ts-loader", exclude: /node_modules/ }
+      { test: /\.(ts|tsx)$/, loader: "ts-loader", exclude: /node_modules/ },
+      { test: /\.css$/i, use: ["style-loader", "css-loader"] },
     ],
   },
   resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },

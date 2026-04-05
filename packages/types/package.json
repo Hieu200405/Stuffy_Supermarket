@@ -2,5 +2,9 @@
   "name": "@stuffy/types",
   "version": "1.0.0",
   "main": "index.ts",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^7.1.4",
+    "style-loader": "^4.0.0"
+  }
 }

@@ -10,6 +10,7 @@ module.exports = {
     rules: [
       { test: /\.m?js$/, type: "javascript/auto", resolve: { fullySpecified: false } },
       { test: /\.jsx?$/, use: "babel-loader", exclude: /node_modules/ },
+      { test: /\.css$/, use: ["style-loader", "css-loader"] },
     ],
   },
   resolve: { extensions: [".js", ".jsx"] },
