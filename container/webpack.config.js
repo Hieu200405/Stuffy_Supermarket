@@ -6,28 +6,25 @@ require("dotenv").config();
 
 // Auto-detect environment: use .env for local dev, fall back to process.env for Render deployment
 // Helper to generate dynamic remote promise for Webpack Module Federation
-const dynamicRemote = (name, envVar, defaultUrl) => `
-  promise new Promise((resolve) => {
-    const fetchConfig = () => {
-      if (window._STUFFY_CONFIG_) {
-        const url = window._STUFFY_CONFIG_['${envVar}'] || '${defaultUrl}';
-        const script = document.createElement('script');
-        script.src = \`\${url}/remoteEntry.js\`;
-        script.onload = () => {
-          resolve({
-            get: (request) => window.${name}.get(request),
-            init: (arg) => window.${name}.init(arg),
-          });
-        };
-        document.head.appendChild(script);
-      } else {
-        // Wait for index.html to finish fetching config.json
-        setTimeout(fetchConfig, 10);
-      }
-    };
-    fetchConfig();
-  })
-`;
+const dynamicRemote = (name, envVar, defaultUrl) => `promise new Promise((resolve) => {
+  const fetchConfig = () => {
+    if (window._STUFFY_CONFIG_) {
+      const url = window._STUFFY_CONFIG_['${envVar}'] || '${defaultUrl}';
+      const script = document.createElement('script');
+      script.src = \`\${url}/remoteEntry.js\`;
+      script.onload = () => {
+        resolve({
+          get: (request) => window.${name}.get(request),
+          init: (arg) => window.${name}.init(arg),
+        });
+      };
+      document.head.appendChild(script);
+    } else {
+      setTimeout(fetchConfig, 10);
+    }
+  };
+  fetchConfig();
+})`;
 
 module.exports = {
   mode: "development",
