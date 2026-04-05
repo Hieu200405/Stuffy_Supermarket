@@ -2,9 +2,13 @@ name: Micro Frontend CI/CD Pipeline
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["main", "master", "Dev"]
   pull_request:
-    branches: ["main", "master"]
+    branches: ["main", "master", "Dev"]
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build-and-push-dockerhub:
