@@ -53,7 +53,9 @@ module.exports = {
       name: "header",
 
       filename: "remoteEntry.js",
-
+      remotes: {
+        store: "store@https://stuffy-store-app.onrender.com/remoteEntry.js",
+      },
       exposes: {
         "./Header": "./src/Header",
       },
