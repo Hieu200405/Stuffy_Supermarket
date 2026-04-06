@@ -94,7 +94,7 @@ export default function UserProfile() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-light)', paddingBottom: '20px', marginBottom: '20px' }}>
                       <div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '5px' }}>Order ID</div>
-                        <div style={{ fontWeight: 'mono', color: 'var(--text-main)', fontWeight: 'bold' }}>#{order._id.substring(0, 8)}</div>
+                        <div style={{ fontWeight: 'mono', color: 'var(--text-main)', fontWeight: 'bold' }}>#{order._id?.substring(0, 8) || 'N/A'}</div>
                         <div style={{ marginTop: '8px', fontSize: '0.85rem', color: '#64748b' }}>Placed on {new Date(order.createdAt).toLocaleDateString()}</div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
