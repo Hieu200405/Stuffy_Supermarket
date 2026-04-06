@@ -4,7 +4,9 @@ import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
-import * as Sentry from "@sentry/node";
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { schema } from './schema';
 import Product from './models/Product';
 // @ts-ignore
 import authRoutes from './routes/auth';
@@ -17,6 +19,17 @@ import { protect, admin } from './middleware/auth';
 import { Product as SharedProduct } from '@stuffy/types';
 
 const app = express();
+
+const apolloServer = new ApolloServer({
+  schema,
+});
+
+async function startApollo() {
+  await apolloServer.start();
+  app.use('/graphql', cors<cors.CorsRequest>(), express.json(), expressMiddleware(apolloServer));
+}
+
+startApollo().catch(err => console.error('Apollo Start Error:', err));
 
 Sentry.init({
   dsn: "https://your-dsn-here@o0.ingest.sentry.io/0", // Replace with real Sentry DSN

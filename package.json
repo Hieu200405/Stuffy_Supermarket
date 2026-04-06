@@ -11,6 +11,7 @@
   "workspaces": [
     "container",
     "backend-api",
+    "graphql-gateway",
     "*-app",
     "packages/*"
   ],
