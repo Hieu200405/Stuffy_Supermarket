@@ -11,6 +11,7 @@ import { schema } from './schema';
 import Product from './models/Product';
 import { clearCache } from './redis';
 import { connectRabbitMQ, pubsub } from './rabbitmq';
+import { aiContextSearch } from './ai-search';
 // @ts-ignore
 import authRoutes from './routes/auth';
 // @ts-ignore
@@ -120,6 +121,16 @@ app.get('/api/products', async (req: Request, res: Response) => {
     });
   } catch (e: any) { 
     res.status(500).json({ error: e.message }); 
+  }
+});
+
+app.post('/api/ai/context-search', async (req: Request, res: Response) => {
+  try {
+    const { query } = req.body;
+    const result = await aiContextSearch(query);
+    res.json(result);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
   }
 });
 

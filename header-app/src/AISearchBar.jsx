@@ -75,33 +75,44 @@ export default function AISearchBar() {
 
   const handleSearch = async (e) => {
     if (e.key !== 'Enter' || !query.trim() || loading || cooldown > 0) return;
-    if (!AI_ENABLED) {
-      setAiResult({ message: 'AI search is not configured. Set GEMINI_API_KEY in environment variables.', matches: [] });
-      return;
-    }
+    
     const now = Date.now();
-    if (now - lastCallRef.current < 5000) {
-      setAiResult({ message: 'Please wait a few seconds before searching again.', matches: [] });
+    if (now - lastCallRef.current < 3000) {
+      setAiResult({ message: 'Analyzing too fast! Please slow down.', matches: [] });
       return;
     }
+    
     setLoading(true);
     setAiResult(null);
     lastCallRef.current = now;
+
     try {
-      const resp = await fetch('https://stuffy-backend-api.onrender.com/api/products?pageNumber=1&keyword=' + encodeURIComponent(query))
-        .then(r => r.json()).catch(() => ({ products: [] }));
+      // Calling our NEW Centralized AI Backend Search
+      const response = await fetch('https://stuffy-backend-api.onrender.com/api/ai/context-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+
+      if (!response.ok) throw new Error('AI Service unavailable');
       
-      const products = resp.products || [];
-      const result = await callGemini(query, products);
-      setAiResult(result);
-      window.dispatchEvent(new CustomEvent('AI_SEARCH_RESULT', { detail: { matches: result.matches, query } }));
+      const result = await response.json();
+      
+      // Adapt backend response to frontend view
+      const adaptedResult = {
+        message: result.reasoning,
+        matches: result.matches.map(p => p.name)
+      };
+
+      setAiResult(adaptedResult);
+      
+      // Dispatch event to app to highlight these products
+      window.dispatchEvent(new CustomEvent('AI_SEARCH_RESULT', { 
+        detail: { matches: adaptedResult.matches, query } 
+      }));
+
     } catch (err) {
-      if (err.message.includes('429')) {
-        setAiResult({ message: `AI is on cooldown (Gemini Free Tier: 15 req/min). Please retry in 60 seconds.`, matches: [] });
-        startCooldown(60);
-      } else {
-        setAiResult({ message: `Error: ${err.message}`, matches: [] });
-      }
+      setAiResult({ message: `AI Service Error: ${err.message}`, matches: [] });
     } finally {
       setLoading(false);
     }
