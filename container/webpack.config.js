@@ -7,35 +7,41 @@ require("dotenv").config();
 
 // Auto-detect environment: use .env for local dev, fall back to process.env for Render deployment
 // Helper to generate dynamic remote promise for Webpack Module Federation
-const dynamicRemote = (name, envVar, defaultUrl) => `promise new Promise((resolve, reject) => {
+// Helper to generate dynamic remote promise for Webpack Module Federation
+const dynamicRemote = (name, envVar, defaultUrl, localPort) => `promise new Promise((resolve, reject) => {
   let retries = 0;
   const maxRetries = 10;
   const fetchConfig = () => {
     if (window._STUFFY_CONFIG_) {
-      const url = window._STUFFY_CONFIG_['${envVar}'] || '${defaultUrl}';
-      const loadScript = () => {
+      const remoteUrl = window._STUFFY_CONFIG_['${envVar}'] || '${defaultUrl}';
+      const loadScript = (url, isFallback = false) => {
         const script = document.createElement('script');
         script.src = \`\${url}/remoteEntry.js?t=\${new Date().getTime()}\`;
         script.onload = () => {
+          console.log(\`[ModuleFederation] \${name} loaded successfully from \${url}\`);
           resolve({
             get: (request) => window.${name}.get(request),
             init: (arg) => window.${name}.init(arg),
           });
         };
         script.onerror = () => {
-          if (retries < maxRetries) {
+          if (!isFallback && retries < maxRetries) {
             retries++;
-            const delay = 3000 * retries;
-            console.warn(\`Retrying to load remote ${name} (\${retries}/\${maxRetries}) in \${delay}ms...\`);
-            setTimeout(loadScript, delay);
+            const delay = 2000 + (retries * 1000);
+            console.warn(\`[ModuleFederation] Retrying \${name} (\${retries}/\${maxRetries}) from \${url} in \${delay}ms...\`);
+            setTimeout(() => loadScript(url), delay);
+          } else if (!isFallback && window.location.hostname === 'localhost' && ${localPort}) {
+            const localUrl = \`http://localhost:${localPort}\`;
+            console.error(\`[ModuleFederation] Failed to load \${name} from \${url}. Falling back to LOCALHOST: \${localUrl}\`);
+            loadScript(localUrl, true);
           } else {
-            console.error(\`Failed to load remote ${name} after \${maxRetries} retries.\`);
-            reject(new Error(\`Failed to load remote ${name}\`));
+            console.error(\`[ModuleFederation] CRITICAL: Failed to load \${name} after \${maxRetries} retries at \${url}\`);
+            reject(new Error(\`Failed to load remote \${name}\`));
           }
         };
         document.head.appendChild(script);
       };
-      loadScript();
+      loadScript(remoteUrl);
     } else {
       setTimeout(fetchConfig, 50);
     }
@@ -94,16 +100,16 @@ module.exports = {
       name: "container",
 
       remotes: {
-        header: dynamicRemote("header", "HEADER_URL", "https://stuffy-header-app.onrender.com"),
-        product: dynamicRemote("product", "PRODUCT_URL", "https://stuffy-product-app.onrender.com"),
-        cart: dynamicRemote("cart", "CART_URL", "https://stuffy-cart-app.onrender.com"),
-        admin: dynamicRemote("admin", "ADMIN_URL", "https://stuffy-admin-app.onrender.com"),
-        store: dynamicRemote("store", "STORE_URL", "https://stuffy-store-app.onrender.com"),
-        design_system: dynamicRemote("design_system", "DESIGN_SYSTEM_URL", "https://stuffy-design-system-app.onrender.com"),
-        viewer: dynamicRemote("viewer", "VIEWER_URL", "https://stuffy-3d-viewer-app.onrender.com"),
-        profile: dynamicRemote("profile", "PROFILE_URL", "https://stuffy-profile-app.onrender.com"),
-        marketing: dynamicRemote("marketing", "MARKETING_URL", "https://stuffy-marketing-app.onrender.com"),
-        support: dynamicRemote("support", "SUPPORT_URL", "https://stuffy-support-app.onrender.com"),
+        header: dynamicRemote("header", "HEADER_URL", "https://stuffy-header-app.onrender.com", 3001),
+        product: dynamicRemote("product", "PRODUCT_URL", "https://stuffy-product-app.onrender.com", 3002),
+        cart: dynamicRemote("cart", "CART_URL", "https://stuffy-cart-app.onrender.com", 3003),
+        admin: dynamicRemote("admin", "ADMIN_URL", "https://stuffy-admin-app.onrender.com", 3004),
+        store: dynamicRemote("store", "STORE_URL", "https://stuffy-store-app.onrender.com", 3005),
+        design_system: dynamicRemote("design_system", "DESIGN_SYSTEM_URL", "https://stuffy-design-system-app.onrender.com", 3006),
+        viewer: dynamicRemote("viewer", "VIEWER_URL", "https://stuffy-3d-viewer-app.onrender.com", 3007),
+        profile: dynamicRemote("profile", "PROFILE_URL", "https://stuffy-profile-app.onrender.com", 3008),
+        marketing: dynamicRemote("marketing", "MARKETING_URL", "https://stuffy-marketing-app.onrender.com", 3009),
+        support: dynamicRemote("support", "SUPPORT_URL", "https://stuffy-support-app.onrender.com", 3010),
       },
 
       shared: {
