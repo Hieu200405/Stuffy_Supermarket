@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM public.ecr.aws/docker/library/node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
@@ -11,7 +11,7 @@ COPY profile-app ./profile-app
 WORKDIR /app/profile-app
 RUN npx webpack --mode production
 
-FROM nginx:alpine
+FROM public.ecr.aws/docker/library/nginx:alpine
 COPY --from=builder /app/profile-app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

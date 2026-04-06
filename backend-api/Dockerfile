@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM public.ecr.aws/docker/library/node:20-alpine AS builder
 WORKDIR /app
 
 # Copy shared configs and packages
@@ -16,7 +16,7 @@ WORKDIR /app/backend-api
 # Điều này giải quyết triệt để lỗi đường dẫn trong Monorepo
 RUN npx -y esbuild server.ts --bundle --platform=node --target=node20 --outfile=dist/server.js && ls -la dist
 
-FROM node:20-alpine
+FROM public.ecr.aws/docker/library/node:20-alpine
 WORKDIR /app
 # Copy necessary files from builder
 COPY --from=builder /app/package*.json ./
