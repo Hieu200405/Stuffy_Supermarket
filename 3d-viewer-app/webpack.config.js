@@ -1,11 +1,13 @@
+const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = require("webpack").container;
 
 module.exports = {
-  mode: "development",
+  mode: "production", // Default to production for build
   entry: "./src/index.js",
   devServer: { port: 3007, historyApiFallback: true },
   output: { publicPath: "auto" },
+  stats: { errorDetails: true }, // Added for better debug
   module: {
     rules: [
       { test: /\.m?js$/, type: "javascript/auto", resolve: { fullySpecified: false } },
@@ -17,7 +19,18 @@ module.exports = {
       },
     ],
   },
-  resolve: { extensions: [".js", ".jsx"] },
+  resolve: {
+    extensions: [".js", ".jsx"],
+    alias: {
+      // Force all packages to use the same 'three' instance from the nearest node_modules
+      three: path.resolve(__dirname, "node_modules/three"),
+    },
+    modules: [
+      path.resolve(__dirname, "node_modules"),
+      path.resolve(__dirname, "../node_modules"), // Root monorepo node_modules
+      "node_modules",
+    ],
+  },
   plugins: [
     new ModuleFederationPlugin({
       name: "viewer",
