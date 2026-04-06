@@ -1,6 +1,7 @@
 import { buildSubgraphSchema } from '@apollo/subgraph';
 import gql from 'graphql-tag';
 import Product from './models/Product';
+import { getCachedData, cacheData, clearCache } from './redis';
 
 export const typeDefs = gql`
   extend schema
@@ -37,6 +38,12 @@ export const resolvers = {
   },
   Query: {
     products: async (_: any, { keyword, category, pageNumber = 1 }: any) => {
+      const cacheKey = `products:${keyword || 'all'}:${category || 'all'}:${pageNumber}`;
+      
+      // Try to get from Cache
+      const cached = await getCachedData<any>(cacheKey);
+      if (cached) return cached;
+
       const pageSize = 8;
       const query: any = {};
       
@@ -53,15 +60,28 @@ export const resolvers = {
         .limit(pageSize)
         .skip(pageSize * (pageNumber - 1));
 
-      return {
+      const response = {
         products,
         page: pageNumber,
         pages: Math.ceil(count / pageSize),
         total: count
       };
+
+      // Store in Cache for 300 seconds (5 mins)
+      await cacheData(cacheKey, response, 300);
+
+      return response;
     },
     product: async (_: any, { id }: any) => {
-      return await Product.findById(id);
+      const cacheKey = `product:${id}`;
+      const cached = await getCachedData<any>(cacheKey);
+      if (cached) return cached;
+      
+      const product = await Product.findById(id);
+      if (product) {
+        await cacheData(cacheKey, product, 3600);
+      }
+      return product;
     },
   },
 };

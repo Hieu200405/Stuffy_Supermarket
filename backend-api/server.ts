@@ -9,6 +9,7 @@ import { expressMiddleware } from '@apollo/server/express4';
 import * as Sentry from "@sentry/node";
 import { schema } from './schema';
 import Product from './models/Product';
+import { clearCache } from './redis';
 // @ts-ignore
 import authRoutes from './routes/auth';
 // @ts-ignore
@@ -113,6 +114,7 @@ app.post('/api/products', protect, admin, async (req: Request, res: Response) =>
   try {
     const newProduct = new Product(req.body);
     await newProduct.save();
+    await clearCache('products:*'); // Invalidate listed products
     io.emit('NEW_PRODUCT', newProduct);
     res.json(newProduct);
   } catch (e: any) { 
