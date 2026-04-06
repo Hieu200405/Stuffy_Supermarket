@@ -16,7 +16,7 @@ jobs:
     # Dùng tính năng matrix để lặp lại việc build tự động cho toàn bộ MFE + Backend
     strategy:
       matrix:
-        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, 3d-viewer-app, backend-api]
+        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, 3d-viewer-app, backend-api, profile-app, marketing-app, support-app]
 
     steps:
       - name: Tải mã nguồn
@@ -63,7 +63,7 @@ jobs:
 
   deploy-to-render:
     needs: build-and-push-dockerhub
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/Dev'
     runs-on: ubuntu-latest
     steps:
       - name: Kích hoạt Webhook Deploy của Render
@@ -78,3 +78,6 @@ jobs:
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_DESIGN_SYSTEM }} > /dev/null || true
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_VIEWER }} > /dev/null || true
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_PROFILE }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_MARKETING }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_SUPPORT }} > /dev/null || true
