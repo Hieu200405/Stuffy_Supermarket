@@ -1,13 +1,14 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = require("webpack").container;
+const deps = require("./package.json").dependencies;
 
 module.exports = {
-  mode: "production", // Default to production for build
+  mode: "production",
   entry: "./src/index.js",
   devServer: { port: 3007, historyApiFallback: true },
   output: { publicPath: "auto" },
-  stats: { errorDetails: true }, // Added for better debug
+  stats: { errorDetails: true },
   module: {
     rules: [
       { test: /\.m?js$/, type: "javascript/auto", resolve: { fullySpecified: false } },
@@ -21,10 +22,7 @@ module.exports = {
   },
   resolve: {
     extensions: [".js", ".jsx"],
-    alias: {
-      // Use require.resolve to find the actual location of 'three' in a monorepo
-      three: path.dirname(require.resolve("three/package.json")),
-    },
+    symlinks: false, // Helps resolving in monorepos
     modules: [
       path.resolve(__dirname, "node_modules"),
       path.resolve(__dirname, "../node_modules"),
@@ -36,7 +34,11 @@ module.exports = {
       name: "viewer",
       filename: "remoteEntry.js",
       exposes: { "./Viewer": "./src/Viewer" },
-      shared: { react: { singleton: true }, "react-dom": { singleton: true }, three: { singleton: true } },
+      shared: {
+        react: { singleton: true, requiredVersion: deps.react },
+        "react-dom": { singleton: true, requiredVersion: deps["react-dom"] },
+        three: { singleton: true, requiredVersion: deps.three },
+      },
     }),
     new HtmlWebpackPlugin({ template: "./public/index.html" }),
   ],
