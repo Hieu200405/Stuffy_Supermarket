@@ -62,6 +62,18 @@ export default function ProductList() {
       setTimeout(() => setFlashingId(null), 1500);
     });
 
+    socket.on("DYNAMIC_PRICE_UPDATE", ({ productId, newPrice, originalPrice, message }) => {
+      setProducts((current) => current.map((p) => (p.id === productId || p._id === productId ? { ...p, price: newPrice, originalPrice } : p)));
+      setFlashingId(productId);
+      
+      // Dispatch a toast event for the flash sale
+      window.dispatchEvent(new CustomEvent('STUFFY_TOAST', { 
+        detail: { message: message, type: 'warning' } 
+      }));
+
+      setTimeout(() => setFlashingId(null), 3000);
+    });
+
     socket.on("NEW_PRODUCT", (newProduct) => {
       if (category === "All" || newProduct.category === category) {
         setProducts((current) => [...current, newProduct]);

@@ -81,6 +81,34 @@ setInterval(() => {
   io.emit('FLASH_SALE_TICK', flashSaleTimeLeft);
 }, 1000);
 
+// Dynamic Pricing Engine: Random Flash Sales every 10 seconds
+setInterval(async () => {
+  try {
+    const products = await Product.find({});
+    if (products.length === 0) return;
+    
+    // Pick random product
+    const randomIndex = Math.floor(Math.random() * products.length);
+    const targetProduct = products[randomIndex];
+    
+    // Calculate flash price (20-50% discount)
+    const discount = 0.5 + Math.random() * 0.3; // 50% to 80% of original
+    const newPrice = Math.round(targetProduct.price * discount);
+    
+    console.log(`[Dynamic Pricing] Flash sale on ${targetProduct.name}: ${targetProduct.price} -> ${newPrice}`);
+    
+    // Broadcast to all clients (Real-time update)
+    io.emit('DYNAMIC_PRICE_UPDATE', {
+      productId: targetProduct._id,
+      newPrice,
+      originalPrice: targetProduct.price,
+      message: `🔥 FLASH SALE: ${targetProduct.name} is now $${newPrice}!`
+    });
+  } catch (err) {
+    console.error('[Dynamic Pricing] Error:', err);
+  }
+}, 10000);
+
 const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/stuffy_db';
 
 mongoose.connect(mongoURI)
