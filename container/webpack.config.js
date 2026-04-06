@@ -9,7 +9,7 @@ require("dotenv").config();
 // Helper to generate dynamic remote promise for Webpack Module Federation
 const dynamicRemote = (name, envVar, defaultUrl) => `promise new Promise((resolve, reject) => {
   let retries = 0;
-  const maxRetries = 5;
+  const maxRetries = 10;
   const fetchConfig = () => {
     if (window._STUFFY_CONFIG_) {
       const url = window._STUFFY_CONFIG_['${envVar}'] || '${defaultUrl}';
@@ -25,8 +25,9 @@ const dynamicRemote = (name, envVar, defaultUrl) => `promise new Promise((resolv
         script.onerror = () => {
           if (retries < maxRetries) {
             retries++;
-            console.warn(\`Retrying to load remote ${name} (\${retries}/\${maxRetries})...\`);
-            setTimeout(loadScript, 2000 * retries);
+            const delay = 3000 * retries;
+            console.warn(\`Retrying to load remote ${name} (\${retries}/\${maxRetries}) in \${delay}ms...\`);
+            setTimeout(loadScript, delay);
           } else {
             console.error(\`Failed to load remote ${name} after \${maxRetries} retries.\`);
             reject(new Error(\`Failed to load remote ${name}\`));

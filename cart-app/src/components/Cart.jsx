@@ -127,7 +127,7 @@ const Cart = () => {
                   </div>
                   <div>
                     <h4 style={{ margin: "0 0 5px 0", fontSize: "1.3rem", fontWeight: '700', color: 'var(--text-main)' }}>{item.name}</h4>
-                    <p style={{ margin: 0, color: "var(--text-muted)", fontWeight: "500", fontSize: '0.9rem' }}>SKU: #{item.id.substring(0,8)}</p>
+                    <p style={{ margin: 0, color: "var(--text-muted)", fontWeight: "500", fontSize: '0.9rem' }}>SKU: #{item.id?.substring(0,8) || 'N/A'}</p>
                   </div>
                 </div>
                 
