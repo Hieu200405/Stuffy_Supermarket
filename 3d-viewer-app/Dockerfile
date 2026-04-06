@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM public.ecr.aws/docker/library/node:20-alpine AS builder
 WORKDIR /app
 
 # Copy shared configs and packages
@@ -14,7 +14,7 @@ COPY 3d-viewer-app ./3d-viewer-app
 WORKDIR /app/3d-viewer-app
 RUN npm run build
 
-FROM nginx:alpine
+FROM public.ecr.aws/docker/library/nginx:alpine
 COPY --from=builder /app/3d-viewer-app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
