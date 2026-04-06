@@ -26,7 +26,7 @@ const apolloServer = new ApolloServer({
 
 async function startApollo() {
   await apolloServer.start();
-  app.use('/graphql', cors<cors.CorsRequest>(), express.json(), expressMiddleware(apolloServer));
+  app.use('/graphql', cors<cors.CorsRequest>(), express.json(), expressMiddleware(apolloServer) as any);
 }
 
 startApollo().catch(err => console.error('Apollo Start Error:', err));

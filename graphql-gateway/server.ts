@@ -28,7 +28,7 @@ const startServer = async () => {
         '/graphql',
         cors<cors.CorsRequest>(),
         express.json(),
-        expressMiddleware(server)
+        expressMiddleware(server) as any
     );
 
     const PORT = 4000;
