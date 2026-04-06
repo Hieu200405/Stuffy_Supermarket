@@ -7,21 +7,36 @@ require("dotenv").config();
 
 // Auto-detect environment: use .env for local dev, fall back to process.env for Render deployment
 // Helper to generate dynamic remote promise for Webpack Module Federation
-const dynamicRemote = (name, envVar, defaultUrl) => `promise new Promise((resolve) => {
+const dynamicRemote = (name, envVar, defaultUrl) => `promise new Promise((resolve, reject) => {
+  let retries = 0;
+  const maxRetries = 5;
   const fetchConfig = () => {
     if (window._STUFFY_CONFIG_) {
       const url = window._STUFFY_CONFIG_['${envVar}'] || '${defaultUrl}';
-      const script = document.createElement('script');
-      script.src = \`\${url}/remoteEntry.js\`;
-      script.onload = () => {
-        resolve({
-          get: (request) => window.${name}.get(request),
-          init: (arg) => window.${name}.init(arg),
-        });
+      const loadScript = () => {
+        const script = document.createElement('script');
+        script.src = \`\${url}/remoteEntry.js?t=\${new Date().getTime()}\`;
+        script.onload = () => {
+          resolve({
+            get: (request) => window.${name}.get(request),
+            init: (arg) => window.${name}.init(arg),
+          });
+        };
+        script.onerror = () => {
+          if (retries < maxRetries) {
+            retries++;
+            console.warn(\`Retrying to load remote ${name} (\${retries}/\${maxRetries})...\`);
+            setTimeout(loadScript, 2000 * retries);
+          } else {
+            console.error(\`Failed to load remote ${name} after \${maxRetries} retries.\`);
+            reject(new Error(\`Failed to load remote ${name}\`));
+          }
+        };
+        document.head.appendChild(script);
       };
-      document.head.appendChild(script);
+      loadScript();
     } else {
-      setTimeout(fetchConfig, 10);
+      setTimeout(fetchConfig, 50);
     }
   };
   fetchConfig();

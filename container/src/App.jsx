@@ -2,9 +2,9 @@ import React, { Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import "design_system/styles";
-// ... existing imports ...
 import ErrorBoundary from "./components/ErrorBoundary";
+// Remove synchronous remote import which causes blank screen with dynamic remotes
+// import "design_system/styles"; 
 import MobileScanner from "./pages/MobileScanner";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -83,6 +83,10 @@ export default function App() {
       toast[type](message);
     };
     window.addEventListener('STUFFY_TOAST', handleToast);
+
+    // Nạp styles từ Design System một cách bất đồng bộ để tránh làm treo ứng dụng
+    import("design_system/styles").catch(err => console.error("Không thể nạp Design System styles:", err));
+
     return () => window.removeEventListener('STUFFY_TOAST', handleToast);
   }, []);
 
