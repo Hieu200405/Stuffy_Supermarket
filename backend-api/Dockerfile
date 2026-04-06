@@ -12,7 +12,8 @@ RUN npm install --workspace=backend-api --include-workspace-root
 # Build the specific app
 COPY backend-api ./backend-api
 WORKDIR /app/backend-api
-RUN npm run build && ls -R dist
+# Chạy tsc trực tiếp và in ra danh sách file trong dist để xác minh
+RUN npx tsc -p tsconfig.json && ls -la && ls -la dist
 
 FROM node:20-alpine
 WORKDIR /app
@@ -25,5 +26,5 @@ COPY --from=builder /app/backend-api/dist ./backend-api/dist
 
 WORKDIR /app/backend-api
 EXPOSE 5000
-# Sử dụng đường dẫn tuyệt đối để tránh mọi sự nhầm lẫn về WORKDIR
-CMD ["node", "/app/backend-api/dist/server.js"]
+# Sử dụng node trực tiếp để nạp file
+CMD ["node", "dist/server.js"]
