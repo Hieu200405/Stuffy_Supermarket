@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
+import * as Sentry from "@sentry/node";
 import { schema } from './schema';
 import Product from './models/Product';
 // @ts-ignore
@@ -26,7 +27,7 @@ const apolloServer = new ApolloServer({
 
 async function startApollo() {
   await apolloServer.start();
-  app.use('/graphql', cors<cors.CorsRequest>(), express.json(), expressMiddleware(apolloServer));
+  app.use('/graphql', cors<cors.CorsRequest>(), express.json(), expressMiddleware(apolloServer) as any);
 }
 
 startApollo().catch(err => console.error('Apollo Start Error:', err));
