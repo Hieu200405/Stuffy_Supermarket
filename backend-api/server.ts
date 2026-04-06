@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
+import * as Sentry from "@sentry/node";
 import { schema } from './schema';
 import Product from './models/Product';
 // @ts-ignore
