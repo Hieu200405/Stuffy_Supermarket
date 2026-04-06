@@ -16,6 +16,7 @@
     "packages/*"
   ],
   "devDependencies": {
+    "three": "^0.163.0",
     "turbo": "^2.9.3",
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.2"
