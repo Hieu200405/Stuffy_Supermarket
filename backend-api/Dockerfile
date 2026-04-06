@@ -12,7 +12,7 @@ RUN npm install --workspace=backend-api --include-workspace-root
 # Build the specific app
 COPY backend-api ./backend-api
 WORKDIR /app/backend-api
-RUN npm run build
+RUN npm run build && ls -R dist
 
 FROM node:20-alpine
 WORKDIR /app
@@ -25,4 +25,5 @@ COPY --from=builder /app/backend-api/dist ./backend-api/dist
 
 WORKDIR /app/backend-api
 EXPOSE 5000
-CMD ["node", "dist/server.js"]
+# Sử dụng đường dẫn tuyệt đối để tránh mọi sự nhầm lẫn về WORKDIR
+CMD ["node", "/app/backend-api/dist/server.js"]
