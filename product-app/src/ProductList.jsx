@@ -36,7 +36,8 @@ export default function ProductList() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const data = await productApi.getAll(keyword, page, category);
+      // This now calls the Federated GraphQL Gateway instead of direct REST
+      const data = await productApi.getAllGraphQL(keyword, page, category);
       if (data && data.products) {
         setProducts(data.products);
         setPages(data.pages);

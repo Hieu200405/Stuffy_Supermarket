@@ -25,6 +25,7 @@ The system is orchestrated using Webpack 5 Module Federation, allowing independe
 
 ### Advanced Capabilities
 - **Module Federation (MFE)**: True isolation of development environments with dynamic remote URL loading via runtime configuration.
+- **Federated GraphQL Gateway (BFF)**: Centralized entry point (Port 4000) orchestrating multiple subgraphs (Products, etc.) for optimized data fetching.
 - **Real-time Synchronization**: Socket.io integration for instant price updates, flash sale countdowns, and cross-device cart syncing.
 - **State Management**: Centralized store patterns using Zustand, accessible across different micro-frontends via the Store App.
 - **Internationalization (i18n)**: Instant system-wide language switching (English/Vietnamese) without page reloads.
@@ -32,6 +33,7 @@ The system is orchestrated using Webpack 5 Module Federation, allowing independe
 - **PWA and Offline Support**: Service Worker integration using Workbox to ensure fast load times and basic offline functionality.
 
 ### Performance and DevOps
+- **Kubernetes Orchestration**: Production-ready Helm charts located in `/kubernetes` with **Horizontal Pod Autoscaling (HPA)** for dynamic scaling based on traffic.
 - **Multi-stage Docker Builds**: Optimized Docker images using Alpine Linux and Nginx to minimize deployment footprint and speed up cold starts.
 - **CI/CD Pipeline**: Automated GitHub Actions workflow utilizing matrix strategies for concurrent building and deployment of all ecosystem apps.
 - **Dynamic Optimization**: Code splitting and lazy loading of heavy modules (like the 3D Engine) to maintain high Lighthouse scores.
