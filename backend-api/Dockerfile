@@ -12,8 +12,9 @@ RUN npm install --workspace=backend-api --include-workspace-root
 # Build the specific app
 COPY backend-api ./backend-api
 WORKDIR /app/backend-api
-# Chạy tsc trực tiếp và in ra danh sách file trong dist để xác minh
-RUN npx tsc -p tsconfig.json && ls -la && ls -la dist
+# Sử dụng esbuild để bundle toàn bộ code (bao gồm cả các gói local @stuffy/*) vào 1 file duy nhất
+# Điều này giải quyết triệt để lỗi đường dẫn trong Monorepo
+RUN npx -y esbuild server.ts --bundle --platform=node --target=node20 --outfile=dist/server.js && ls -la dist
 
 FROM node:20-alpine
 WORKDIR /app
