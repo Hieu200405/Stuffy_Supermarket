@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows, Float, PresentationControls, useTexture } from "@react-three/drei";
+import { ARButton, XR, Controllers, Hands } from "@react-three/xr";
 import * as THREE from "three";
 
 // Displays the actual product image as a texture on a floating 3D plane
@@ -63,45 +64,64 @@ export default function Viewer({ color, image, name, onClose }) {
             {name}
           </p>
         </div>
-        <button
-          onClick={onClose}
-          style={{
-            background: 'rgba(255,255,255,0.07)', color: 'white',
-            border: '1px solid rgba(255,255,255,0.15)', padding: '10px 22px',
-            borderRadius: '99px', cursor: 'pointer', fontWeight: '600',
-            fontSize: '0.9rem', transition: 'all 0.2s', fontFamily: 'sans-serif'
-          }}
-          onMouseOver={e => e.target.style.background = 'rgba(239,68,68,0.7)'}
-          onMouseOut={e => e.target.style.background = 'rgba(255,255,255,0.07)'}
-        >
-          ✕ Close
-        </button>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <ARButton 
+            className="ar-launch-button"
+            style={{
+              background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+              color: 'white', border: 'none', padding: '10px 24px',
+              borderRadius: '99px', cursor: 'pointer', fontWeight: '800',
+              fontSize: '0.9rem', boxShadow: '0 4px 15px rgba(99,102,241,0.3)',
+              textTransform: 'uppercase', letterSpacing: '0.5px'
+            }}
+          >
+            ✦ Start AR View
+          </ARButton>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'rgba(255,255,255,0.07)', color: 'white',
+              border: '1px solid rgba(255,255,255,0.15)', padding: '10px 22px',
+              borderRadius: '99px', cursor: 'pointer', fontWeight: '600',
+              fontSize: '0.9rem', transition: 'all 0.2s', fontFamily: 'sans-serif'
+            }}
+            onMouseOver={e => e.target.style.background = 'rgba(239,68,68,0.7)'}
+            onMouseOut={e => e.target.style.background = 'rgba(255,255,255,0.07)'}
+          >
+            ✕ Close
+          </button>
+        </div>
       </div>
 
       {/* 3D Canvas */}
       <div style={{ flex: 1, position: 'relative' }}>
         <Canvas shadows camera={{ position: [0, 0, 6], fov: 42 }}>
-          <ambientLight intensity={0.6} />
-          <spotLight position={[8, 12, 8]} angle={0.25} penumbra={1} intensity={2.5} castShadow />
-          <pointLight position={[-5, -5, 5]} intensity={0.8} color={color || "#6366f1"} />
+          <XR>
+            <Controllers />
+            <Hands />
+            
+            <ambientLight intensity={0.6} />
+            <spotLight position={[8, 12, 8]} angle={0.25} penumbra={1} intensity={2.5} castShadow />
+            <pointLight position={[-5, -5, 5]} intensity={0.8} color={color || "#6366f1"} />
 
-          <Environment preset="studio" />
+            <Environment preset="studio" />
 
-          <PresentationControls
-            global
-            config={{ mass: 2, tension: 400 }}
-            snap={{ mass: 4, tension: 1200 }}
-            rotation={[0, 0.2, 0]}
-            polar={[-Math.PI / 4, Math.PI / 4]}
-            azimuth={[-Math.PI / 2, Math.PI / 2]}
-          >
-            <Float speed={1.5} rotationIntensity={0.4} floatIntensity={0.8}>
-              <ProductDisplay color={color} image={image} />
-            </Float>
-          </PresentationControls>
+            <PresentationControls
+              global
+              config={{ mass: 2, tension: 400 }}
+              snap={{ mass: 4, tension: 1200 }}
+              rotation={[0, 0.2, 0]}
+              polar={[-Math.PI / 4, Math.PI / 4]}
+              azimuth={[-Math.PI / 2, Math.PI / 2]}
+            >
+              <Float speed={1.5} rotationIntensity={0.4} floatIntensity={0.8}>
+                <ProductDisplay color={color} image={image} />
+              </Float>
+            </PresentationControls>
 
-          <ContactShadows position={[0, -2.8, 0]} opacity={0.5} scale={12} blur={2} far={4} color="#000" />
-          <OrbitControls enableZoom={true} enablePan={false} autoRotate={false} />
+            <ContactShadows position={[0, -2.8, 0]} opacity={0.5} scale={12} blur={2} far={4} color="#000" />
+            <OrbitControls enableZoom={true} enablePan={false} autoRotate={false} />
+          </XR>
         </Canvas>
       </div>
 
