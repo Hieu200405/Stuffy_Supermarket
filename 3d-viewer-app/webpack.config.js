@@ -22,12 +22,12 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"],
     alias: {
-      // Force all packages to use the same 'three' instance from the nearest node_modules
-      three: path.resolve(__dirname, "node_modules/three"),
+      // Use require.resolve to find the actual location of 'three' in a monorepo
+      three: path.dirname(require.resolve("three/package.json")),
     },
     modules: [
       path.resolve(__dirname, "node_modules"),
-      path.resolve(__dirname, "../node_modules"), // Root monorepo node_modules
+      path.resolve(__dirname, "../node_modules"),
       "node_modules",
     ],
   },
