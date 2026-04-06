@@ -10,9 +10,11 @@
   "dependencies": {
     "@apollo/server": "^4.10.2",
     "@apollo/subgraph": "^2.7.2",
+    "@pinecone-database/pinecone": "^4.1.0",
     "@sentry/node": "^10.47.0",
     "@sentry/tracing": "^7.120.4",
     "@stuffy/types": "^1.0.0",
+    "amqplib": "^0.10.9",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -22,9 +24,11 @@
     "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.3.2",
+    "openai": "^4.104.0",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.8",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
