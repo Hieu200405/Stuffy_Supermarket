@@ -6,9 +6,8 @@ COPY package*.json ./
 COPY packages ./packages
 COPY backend-api/package*.json ./backend-api/
 COPY backend-api/tsconfig.json ./backend-api/
-
-# Install root dependencies (including workspaces)
-RUN npm install
+# Install root and backend-api dependencies
+RUN npm install --workspace=backend-api --include-workspace-root
 
 # Build the specific app
 COPY backend-api ./backend-api
@@ -17,11 +16,12 @@ RUN npm run build
 
 FROM node:20-alpine
 WORKDIR /app
+# Copy necessary files from builder
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/backend-api/package*.json ./backend-api/
 COPY --from=builder /app/backend-api/dist ./backend-api/dist
-COPY --from=builder /app/node_modules ./node_modules
 
 WORKDIR /app/backend-api
 EXPOSE 5000
