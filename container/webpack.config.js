@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = require("webpack").container;
 const { GenerateSW } = require('workbox-webpack-plugin');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 require("dotenv").config();
 
@@ -99,6 +100,12 @@ module.exports = {
 
     new HtmlWebpackPlugin({
       template: "./public/index.html",
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "public/config.json", to: "." },
+        { from: "public/favicon.ico", to: ".", noErrorOnMissing: true },
+      ],
     }),
 
     // PWA: Generate Service Worker
