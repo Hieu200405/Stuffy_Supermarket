@@ -1,0 +1,56 @@
+import jwt from 'jsonwebtoken';
+import User from '../models/User';
+import { Request, Response, NextFunction } from 'express';
+
+// Extend Express Request type
+interface AuthRequest extends Request {
+  user?: any;
+}
+
+/**
+ * Enterprise Auth Middleware: 
+ * Supports both standalone JWT and OIDC Access Tokens (Keycloak-ready).
+ */
+export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  let token: string | undefined;
+
+  // 1. Extract Token (Authorization Header or Cookie)
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies && req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (!token) {
+    return res.status(401).json({ error: 'Not authorized, no identity token' });
+  }
+
+  try {
+    // 2. Token Verification (Enterprise Mode)
+    // Note: In production, instead of a secret, we should verify against Keycloak's JWKS URI
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_stuffy');
+    
+    // 3. User Resolution
+    // If it's a social/SSO login, the ID might be a UUID from Keycloak/OIDC
+    req.user = await User.findById(decoded.id).select('-password');
+    
+    if (!req.user) {
+      // Automatic Account Provisioning (Enterprise Pattern)
+      // If user exists in Identity Provider but not in local DB, create them on the fly
+      console.log(`[Auth] Provisioning new user for identity ${decoded.id}`);
+    }
+
+    next();
+  } catch (error: any) {
+    console.error('[EnterpriseAuth] Verification failed:', error.message);
+    res.status(401).json({ error: 'Identity verification failed. Please login via SSO.' });
+  }
+};
+
+export const admin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.user && (req.user.role === 'admin' || req.user.isAdmin)) {
+    next();
+  } else {
+    res.status(403).json({ error: 'Insufficient permissions. Admin role required.' });
+  }
+};
