@@ -10,6 +10,7 @@ import * as Sentry from "@sentry/node";
 import { schema } from './schema';
 import Product from './models/Product';
 import { clearCache } from './redis';
+import { connectRabbitMQ, pubsub } from './rabbitmq';
 // @ts-ignore
 import authRoutes from './routes/auth';
 // @ts-ignore
@@ -32,6 +33,18 @@ async function startApollo() {
 }
 
 startApollo().catch(err => console.error('Apollo Start Error:', err));
+
+// RabbitMQ Connection & Internal Worker Simulation
+connectRabbitMQ().then(() => {
+  // Simulate a Heavy Worker: Sync inventory to legacy systems (ERP/WMS)
+  pubsub.subscribe('INVENTORY_SYNC', (data) => {
+    console.log(`[Worker] 🚀 Heavy Task Started: Syncing product ${data.name} to secondary systems...`);
+    // Simulate complex calculation or slow API call (3s delay)
+    setTimeout(() => {
+        console.log(`[Worker] ✅ Task Completed: Product ${data.name} successfully synced.`);
+    }, 3000);
+  });
+}).catch(console.error);
 
 Sentry.init({
   dsn: "https://your-dsn-here@o0.ingest.sentry.io/0", // Replace with real Sentry DSN
@@ -115,6 +128,11 @@ app.post('/api/products', protect, admin, async (req: Request, res: Response) =>
     const newProduct = new Product(req.body);
     await newProduct.save();
     await clearCache('products:*'); // Invalidate listed products
+    
+    // Async heavy tasks via Message Broker
+    pubsub.publish('INVENTORY_SYNC', newProduct);
+    pubsub.publish('EMAIL_NOTIFICATIONS', { to: 'admin@stuffy.com', body: `New Product Added: ${newProduct.name}` });
+
     io.emit('NEW_PRODUCT', newProduct);
     res.json(newProduct);
   } catch (e: any) { 

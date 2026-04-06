@@ -69,6 +69,17 @@ services:
     volumes:
       - redis_data:/data
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"   # AMQP protocol
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=stuffy
+      - RABBITMQ_DEFAULT_PASS=stuffyypass
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+
   mongodb:
     image: mongo:latest
     ports:
@@ -79,3 +90,4 @@ services:
 volumes:
   mongo_data:
   redis_data:
+  rabbit_data:
