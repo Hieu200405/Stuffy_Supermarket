@@ -63,7 +63,7 @@ jobs:
 
   deploy-to-render:
     needs: build-and-push-dockerhub
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/Dev'
     runs-on: ubuntu-latest
     steps:
       - name: Kích hoạt Webhook Deploy của Render
