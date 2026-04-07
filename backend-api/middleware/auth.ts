@@ -5,14 +5,19 @@ import { Request, Response, NextFunction } from 'express';
 // Extend Express Request type
 interface AuthRequest extends Request {
   user?: any;
+  tenantId?: string;
 }
 
 /**
  * Enterprise Auth Middleware: 
  * Supports both standalone JWT and OIDC Access Tokens (Keycloak-ready).
+ * Also handles Tenant Context for SaaS multi-tenancy.
  */
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
   let token: string | undefined;
+
+  // 1. Extract Tenant Identity (SaaS support)
+  req.tenantId = (req.headers['x-tenant-id'] as string) || 'default_store';
 
   // 1. Extract Token (Authorization Header or Cookie)
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
