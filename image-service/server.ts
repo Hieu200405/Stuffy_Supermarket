@@ -23,6 +23,8 @@ const interServiceAuth = (req: Request, res: Response, next: any) => {
     }
     
     const token = authHeader.split(' ')[1];
+    if (!token) return res.status(401).send('Broken Auth Token');
+    
     try {
         jwt.verify(token, INTERNAL_SECRET as string);
         next();
