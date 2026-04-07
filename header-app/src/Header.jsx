@@ -44,6 +44,29 @@ export default function Header() {
         {/* Notification Bell Component */}
         <NotificationBell />
         
+        {/* 🌎 Integrated Theme Switcher (Shared DS MFE) */}
+        <div style={{ display: 'flex', gap: '8px', marginRight: '10px' }}>
+          {['default', 'emerald', 'midnight'].map(t => (
+            <button 
+                key={t}
+                onClick={() => {
+                  try {
+                    // @ts-ignore
+                    const { applyTheme } = require('design_system/ThemeConfig');
+                    applyTheme(t);
+                  } catch (e) {
+                    console.warn("ThemeConfig service unavailable.");
+                  }
+                }}
+                title={`Switch to ${t} theme`}
+                style={{ 
+                  width: '18px', height: '18px', borderRadius: '50%', cursor: 'pointer', border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  background: t === 'default' ? '#6366f1' : t === 'emerald' ? '#10b981' : '#a855f7'
+                }}
+            />
+          ))}
+        </div>
+
         {/* Sync i18n Switcher */}
         <LanguageSwitcher />
 
