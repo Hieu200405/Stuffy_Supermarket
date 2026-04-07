@@ -9,6 +9,7 @@ import MobileScanner from "./pages/MobileScanner";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Navigate } from "react-router-dom";
+import { prefetchRemote, REMOTE_MAP } from "./utils/prefetch";
 
 const Header = React.lazy(() => import("header/Header"));
 // ... existing lazy imports ...
@@ -36,17 +37,30 @@ const ProtectedModule = ({ children, moduleName }) => (
 const Navbar = () => {
   const { user, logout } = useAuth();
 
+  useEffect(() => {
+    // 🏦 Pre-warm the Admin panel if user is Admin, as it's a heavy app
+    if (user?.role === 'admin') {
+      prefetchRemote('admin', REMOTE_MAP.admin);
+    }
+  }, [user]);
+
   return (
     <nav style={{ display: 'flex', justifyContent: 'center', gap: '40px', padding: '20px 0 0 0', borderBottom: '1px solid var(--border-light)', background: 'white', position: 'relative' }}>
       <div style={{ display: 'flex', gap: '40px' }}>
         <NavLink to="/" end style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? 'var(--primary-color)' : 'var(--text-muted)', borderBottom: isActive ? '3px solid var(--primary-color)' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
           Products
         </NavLink>
-        <NavLink to="/cart" style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? 'var(--primary-color)' : 'var(--text-muted)', borderBottom: isActive ? '3px solid var(--primary-color)' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
+        <NavLink 
+          to="/cart" 
+          onMouseEnter={() => prefetchRemote('cart', REMOTE_MAP.cart)}
+          style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? 'var(--primary-color)' : 'var(--text-muted)', borderBottom: isActive ? '3px solid var(--primary-color)' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
           Cart
         </NavLink>
         {user?.role === 'admin' && (
-          <NavLink to="/admin" style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? '#ef4444' : 'var(--text-muted)', borderBottom: isActive ? '3px solid #ef4444' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
+          <NavLink 
+            to="/admin" 
+            onMouseEnter={() => prefetchRemote('admin', REMOTE_MAP.admin)}
+            style={({isActive}) => ({ textDecoration: 'none', fontWeight: isActive ? '800' : '600', color: isActive ? '#ef4444' : 'var(--text-muted)', borderBottom: isActive ? '3px solid #ef4444' : '3px solid transparent', paddingBottom: '20px', marginBottom: '-1px', transition: 'all 0.2s' })}>
             Admin
           </NavLink>
         )}
@@ -55,7 +69,7 @@ const Navbar = () => {
       <div style={{ position: 'absolute', right: '30px', top: '15px' }}>
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <NavLink to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <NavLink to="/profile" onMouseEnter={() => prefetchRemote('profile', REMOTE_MAP.profile)} style={{ textDecoration: 'none', color: 'inherit' }}>
               <span style={{ fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', padding: '6px 12px', borderRadius: '8px', background: '#f8fafc', transition: 'all 0.2s' }} onMouseOver={e=>e.target.style.background='#f1f5f9'} onMouseOut={e=>e.target.style.background='#f8fafc'}>
                 👤 Hi, {user.name}
               </span>
