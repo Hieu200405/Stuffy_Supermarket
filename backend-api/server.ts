@@ -18,6 +18,7 @@ import { DiscountEngine } from './services/DiscountEngine';
 import { PaymentService } from './services/PaymentService';
 import { AiCopilot } from './services/AiCopilot';
 import { ImageGenService } from './services/ImageGenService';
+import MfeModule from './models/MfeModule';
 // @ts-ignore
 import authRoutes from './routes/auth';
 // @ts-ignore
@@ -203,6 +204,28 @@ mongoose.connect(mongoURI)
       ]);
       console.log('[Seed] Advanced Discount Rules configured.');
     }
+
+    const mfeCount = await MfeModule.countDocuments();
+    if (mfeCount === 0) {
+      await MfeModule.insertMany([
+        { 
+          name: 'store', 
+          activeUrl: 'https://stuffy-store-app.onrender.com/remoteEntry.js',
+          versions: [{ version: '1.0.0', url: 'https://stuffy-store-app.onrender.com/remoteEntry.js' }]
+        },
+        { 
+          name: 'header', 
+          activeUrl: 'https://stuffy-header-app.onrender.com/remoteEntry.js',
+          versions: [{ version: '1.0.0', url: 'https://stuffy-header-app.onrender.com/remoteEntry.js' }]
+        },
+        { 
+          name: 'product', 
+          activeUrl: 'https://stuffy-product-app.onrender.com/remoteEntry.js',
+          versions: [{ version: '1.0.0', url: 'https://stuffy-product-app.onrender.com/remoteEntry.js' }]
+        }
+      ]);
+      console.log('[Seed] MFE Registry initialized.');
+    }
   });
 
 app.get('/api/products', async (req: Request, res: Response) => {
@@ -284,6 +307,41 @@ app.get('/api/marketing/dynamic-visual', async (req: Request, res: Response) => 
   } catch (e: any) {
     Sentry.captureException(e);
     res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/registry/manifest', async (req: Request, res: Response) => {
+  try {
+    const modules = await MfeModule.find({});
+    const manifest: Record<string, string> = {};
+    modules.forEach(m => {
+      manifest[m.name] = m.activeUrl;
+    });
+    res.json(manifest);
+  } catch (e: any) {
+    Sentry.captureException(e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/registry/switch-version', admin, async (req: Request, res: Response) => {
+  try {
+    const { name, version } = req.body;
+    const mfe = await MfeModule.findOne({ name });
+    if (!mfe) return res.status(404).json({ message: 'MFE not found' });
+
+    const target = mfe.versions.find(v => v.version === version);
+    if (!target) return res.status(400).json({ message: 'Version not found' });
+
+    mfe.activeUrl = target.url;
+    await mfe.save();
+    
+    // Invalidate manifest cache
+    await clearCache('manifest');
+    
+    res.json({ message: `Successfully switched ${name} to ${version}`, activeUrl: mfe.activeUrl });
+  } catch (e: any) {
+    Sentry.captureException(e);
   }
 });
 

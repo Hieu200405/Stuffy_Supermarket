@@ -35,7 +35,8 @@ module.exports = {
         "./Button": "./src/components/Button",
         "./GlassCard": "./src/components/GlassCard",
         "./ProductSkeleton": "./src/components/ProductSkeleton",
-        "./styles": "./src/index.css"
+        "./styles": "./src/index.css",
+        "./ThemeConfig": "./src/ThemeConfig"
       },
       shared: {
         react: { singleton: true, requiredVersion: false },

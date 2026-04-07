@@ -55,6 +55,7 @@ module.exports = {
       filename: "remoteEntry.js",
       remotes: {
         store: "store@https://stuffy-store-app.onrender.com/remoteEntry.js",
+        design_system: "design_system@https://stuffy-design-system-app.onrender.com/remoteEntry.js",
       },
       exposes: {
         "./Header": "./src/Header",
