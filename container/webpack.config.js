@@ -56,7 +56,7 @@ module.exports = {
   plugins: [
     new ModuleFederationPlugin({
       name: "container",
-
+      remoteType: "var",
       remotes: {
         header: "header",
         product: "product",
