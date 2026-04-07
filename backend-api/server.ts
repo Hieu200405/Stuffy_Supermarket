@@ -18,6 +18,7 @@ import { DiscountEngine } from './services/DiscountEngine';
 import { PaymentService } from './services/PaymentService';
 import { AiCopilot } from './services/AiCopilot';
 import { ImageGenService } from './services/ImageGenService';
+import { getResilientImage } from './services/ResilienceService';
 import MfeModule from './models/MfeModule';
 // @ts-ignore
 import authRoutes from './routes/auth';
@@ -304,6 +305,28 @@ app.get('/api/marketing/dynamic-visual', async (req: Request, res: Response) => 
 
     const imageUrl = await ImageGenService.generateThemedVisual(productName as string, theme as any);
     res.json({ imageUrl });
+  } catch (e: any) {
+    Sentry.captureException(e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/images/proxy', async (req: Request, res: Response) => {
+  try {
+    const { url, w = '800', q = '80' } = req.query;
+    if (!url) return res.status(400).json({ error: 'url is required' });
+
+    const result = await getResilientImage(url as string, parseInt(w as string), parseInt(q as string));
+    
+    if (typeof result === 'string') {
+        // Circuit is OPEN or fallback triggered -> Serving Placeholder URL
+        return res.redirect(result);
+    }
+    
+    // Circuit is CLOSED -> Serving binary optimized data from Image-Service
+    res.setHeader('Content-Type', 'image/webp');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.send(result);
   } catch (e: any) {
     Sentry.captureException(e);
     res.status(500).json({ error: e.message });

@@ -21,6 +21,7 @@
     "@sentry/tracing": "^7.120.4",
     "@stuffy/types": "^1.0.0",
     "amqplib": "^0.10.9",
+    "axios": "^1.14.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -32,6 +33,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.3.2",
     "openai": "^4.33.0",
+    "opossum": "^9.0.0",
     "socket.io": "^4.7.5",
     "stripe": "^15.1.0"
   },
@@ -44,6 +46,7 @@
     "@types/json-logic-js": "^2.0.8",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.5.2",
+    "@types/opossum": "^8.1.9",
     "css-loader": "^7.1.4",
     "nodemon": "^3.1.0",
     "style-loader": "^4.0.0",
