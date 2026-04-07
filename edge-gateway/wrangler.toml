@@ -1,0 +1,12 @@
+name = "stuffy-esr-gateway"
+main = "worker.mjs"
+compatibility_date = "2024-04-01"
+
+[env.production]
+# Global edge settings
+routes = [
+	{ pattern = "stuffy-supermarket.com/*", custom_domain = true }
+]
+
+[observability]
+enabled = true
