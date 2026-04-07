@@ -14,12 +14,24 @@ import {
   fieldExtensionsEstimator 
 } from 'graphql-query-complexity';
 
-// Setup Redis for Rate Limiting
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+// Setup Redis for Rate Limiting (Resilient Config)
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  maxRetriesPerRequest: 3,
+  retryStrategy: (times) => Math.min(times * 100, 3000),
+  showFriendlyErrorStack: true,
+});
+
+redis.on('error', (err) => console.error('[Gateway] ❌ Redis Connection Error:', err.message));
+
+// Detect Production for Subgraphs
+const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
+const BACKEND_URL = process.env.PRODUCTS_SERVICE_URL || (isProduction 
+  ? 'https://stuffy-backend-api.onrender.com/graphql' 
+  : 'http://localhost:5000/graphql');
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  windowMs: 15 * 60 * 1000, 
+  max: 100, 
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
@@ -35,7 +47,7 @@ const httpServer = http.createServer(app);
 const gateway = new ApolloGateway({
   supergraphSdl: new IntrospectAndCompose({
     subgraphs: [
-      { name: 'products', url: process.env.PRODUCTS_SERVICE_URL || 'http://localhost:5000/graphql' },
+      { name: 'products', url: BACKEND_URL },
     ],
   }),
 });
