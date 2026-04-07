@@ -16,6 +16,7 @@ import { aiContextSearch } from './ai-search';
 import DiscountRule from './models/DiscountRule';
 import { DiscountEngine } from './services/DiscountEngine';
 import { PaymentService } from './services/PaymentService';
+import { AiCopilot } from './services/AiCopilot';
 // @ts-ignore
 import authRoutes from './routes/auth';
 // @ts-ignore
@@ -239,6 +240,20 @@ app.post('/api/ai/context-search', async (req: Request, res: Response) => {
     const result = await aiContextSearch(query);
     res.json(result);
   } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/ai/copilot/chat', async (req: Request, res: Response) => {
+  try {
+    const { query } = req.body;
+    const tenantId = (req.headers['x-tenant-id'] as string) || 'default_store';
+    
+    const result = await AiCopilot.handleChat(query, tenantId);
+    
+    res.json(result);
+  } catch (e: any) {
+    Sentry.captureException(e);
     res.status(500).json({ error: e.message });
   }
 });

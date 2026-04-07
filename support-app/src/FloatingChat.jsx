@@ -30,49 +30,25 @@ export default function FloatingChat() {
     setLoading(true);
 
     try {
-      // 1. Get Context (Orders metadata if user is logged in)
-      const userInfoString = localStorage.getItem('userInfo');
-      let orderContext = "User is not logged in.";
-      if (userInfoString) {
-        const user = JSON.parse(userInfoString);
-        try {
-          const res = await fetch("https://stuffy-backend-api.onrender.com/api/orders/myorders", {
-            headers: { "Authorization": `Bearer ${user.token}` }
-          });
-          if (res.ok) {
-            const orders = await res.json();
-            orderContext = `Customer Name: ${user.name}. \nRecent Orders: \n` + 
-              orders.map(o => `- Order ID: ${o._id}, Status: ${o.status || 'Processing'}, Total: $${o.totalPrice}, Items: ${o.orderItems.map(i => i.name).join(', ')}`).join('\n');
-          }
-        } catch (err) { orderContext = "Failed to fetch orders context."; }
-      }
-
-      // 2. Call Gemini
-      const prompt = `You are a professional and friendly Customer Service Agent for Stuffy Store. 
-      Context about the current user:
-      ${orderContext}
-
-      Instructions:
-      - Answer based on the user's request.
-      - If they ask about orders, look at the Context provided.
-      - If they ask about products, explain that you are a general support bot and they can use the AI Search in header for catalog.
-      - Be concise and helpful.
-      - User Query: "${userMessage}"`;
-
-      const response = await fetch(API_URL, {
+      const tenantId = localStorage.getItem('tenantId') || 'default_store';
+      const response = await fetch("https://stuffy-backend-api.onrender.com/api/ai/copilot/chat", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.5, maxOutputTokens: 800 }
-        })
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-tenant-id': tenantId
+        },
+        body: JSON.stringify({ query: userMessage })
       });
 
-      if (!response.ok) throw new Error("Gemini Service Unavailable");
+      if (!response.ok) throw new Error("AI Copilot Service Unavailable");
+      
       const data = await response.json();
-      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I'm having trouble thinking right now. Please try again.";
-
-      setMessages(prev => [...prev, { role: 'ai', text: aiResponse }]);
+      
+      setMessages(prev => [...prev, { 
+        role: 'ai', 
+        text: data.answer,
+        suggestions: data.suggestedProducts
+      }]);
     } catch (err) {
       console.error(err);
       setMessages(prev => [...prev, { role: 'ai', text: "Error: " + err.message }]);
@@ -125,6 +101,23 @@ export default function FloatingChat() {
                   lineHeight: '1.5'
                 }}>
                    {m.text}
+                   
+                   {/* 🎁 AI Suggested Products Rendering */}
+                   {m.suggestions && m.suggestions.length > 0 && (
+                     <div style={{ marginTop: '12px', display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px' }}>
+                        {m.suggestions.map((p, idx) => (
+                          <div key={idx} style={{ 
+                            minWidth: '140px', background: 'white', borderRadius: '12px', padding: '10px', 
+                            border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                            transition: 'transform 0.2s', cursor: 'pointer'
+                          }} onMouseOver={e=>e.currentTarget.style.transform='translateY(-3px)'} onMouseOut={e=>e.currentTarget.style.transform='none'}>
+                             <img src={p.image} style={{ width: '100%', height: '80px', objectFit: 'contain', marginBottom: '8px' }} />
+                             <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-main)', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</div>
+                             <div style={{ fontSize: '0.85rem', fontWeight: '900', color: 'var(--primary-color)', marginTop: '4px' }}>${p.price}</div>
+                          </div>
+                        ))}
+                     </div>
+                   )}
                 </div>
              ))}
              {loading && (
