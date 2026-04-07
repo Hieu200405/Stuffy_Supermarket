@@ -69,19 +69,26 @@ jobs:
       - name: Kích hoạt Webhook Deploy của Render
         run: |
           echo "Kích hoạt tự động cập nhật Web server Render từ Github Actions..."
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_CONTAINER }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_HEADER }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_PRODUCT }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_CART }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_ADMIN }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_STORE }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_DESIGN_SYSTEM }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_VIEWER }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_PROFILE }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_MARKETING }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_SUPPORT }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_IMAGE }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_RECOM }} > /dev/null || true
+          
+          # Hàm để trigger deploy nếu secret tồn tại
+          trigger_deploy() {
+            if [[ -n "$1" ]]; then
+              echo "Deploying to hook: ${1:0:10}..."
+              curl -X POST -s "$1" > /dev/null || true
+            fi
+          }
 
-          path: visual-tests/test-results/
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_CONTAINER }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_HEADER }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_PRODUCT }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_CART }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_ADMIN }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_STORE }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_DESIGN_SYSTEM }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_VIEWER }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_PROFILE }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_MARKETING }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_SUPPORT }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_IMAGE }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_RECOM }}"
