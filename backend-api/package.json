@@ -24,7 +24,11 @@
     "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.3.2",
-    "openai": "^4.104.0",
+    "@opentelemetry/api": "^1.8.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.43.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.50.0",
+    "@opentelemetry/sdk-node": "^0.50.0",
+    "openai": "^4.33.0",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {
