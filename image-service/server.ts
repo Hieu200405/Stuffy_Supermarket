@@ -1,13 +1,38 @@
-import express, { Request, Response } from 'express';
+import express, { type Request, type Response, type NextFunction } from 'express';
 import sharp from 'sharp';
 import axios from 'axios';
 import cors from 'cors';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
 
 const app = express();
 const CACHE_DIR = path.join(__dirname, 'cache');
+const INTERNAL_SECRET = process.env.STUFFY_INTERNAL_SECRET || 'stuffy_secret_2026';
+
+/**
+ * 🛡️ ZERO TRUST MIDDLEWARE
+ * Rejects any request that doesn't originate from our authenticated Gateway.
+ */
+const interServiceAuth = (req: Request, res: Response, next: any) => {
+    const authHeader = req.headers['x-internal-service-auth'] as string;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.error("[ZeroTrust] ❌ Blocked unauthorized external request.");
+        return res.status(401).send('Unauthorized Service Call');
+    }
+    
+    const token = authHeader.split(' ')[1];
+    if (!token) return res.status(401).send('Broken Auth Token');
+    
+    try {
+        jwt.verify(token, INTERNAL_SECRET as string);
+        next();
+    } catch (e) {
+        console.error("[ZeroTrust] ❌ Token verification failed.");
+        return res.status(401).send('Invalid Internal Token');
+    }
+};
 
 if (!fs.existsSync(CACHE_DIR)) {
   fs.mkdirSync(CACHE_DIR);
@@ -17,7 +42,7 @@ app.use(cors());
 
 app.get('/health', (req, res) => res.send('OK'));
 
-app.get('/optimize', async (req: Request, res: Response) => {
+app.get('/optimize', interServiceAuth, async (req: Request, res: Response) => {
   const imageUrl = req.query.url as string;
   const width = parseInt(req.query.w as string) || 800;
   const quality = parseInt(req.query.q as string) || 80;

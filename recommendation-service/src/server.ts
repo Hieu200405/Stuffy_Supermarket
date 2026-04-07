@@ -1,12 +1,35 @@
-import express from 'express';
+import express, { type Request, type Response, type NextFunction } from 'express';
 import { createClient } from 'redis';
 import amqp from 'amqplib';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 const app = express();
+const INTERNAL_SECRET = process.env.STUFFY_INTERNAL_SECRET || 'stuffy_secret_2026';
+
+/**
+ * 🛡️ ZERO TRUST MIDDLEWARE
+ */
+const interServiceAuth = (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers['x-internal-service-auth'] as string;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized Inter-Service Call' });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Broken Service Auth Token' });
+    
+    try {
+        jwt.verify(token, INTERNAL_SECRET as string);
+        next();
+    } catch (e) {
+        return res.status(401).json({ error: 'Invalid Internal Service Token' });
+    }
+};
+
 app.use(cors());
 app.use(express.json());
 
