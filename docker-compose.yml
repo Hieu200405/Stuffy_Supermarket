@@ -119,8 +119,16 @@ services:
     environment:
       - COLLECTOR_OTLP_ENABLED=true
 
+  image-service:
+    build: ./image-service
+    ports:
+      - "3009:3009"
+    volumes:
+      - image_cache:/app/image-service/cache
+
 volumes:
   mongo_data:
   redis_data:
   rabbit_data:
   postgres_data:
+  image_cache:
