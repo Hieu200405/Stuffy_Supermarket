@@ -4,8 +4,12 @@ import axios from 'axios';
 import cors from 'cors';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const CACHE_DIR = path.join(__dirname, 'cache');
