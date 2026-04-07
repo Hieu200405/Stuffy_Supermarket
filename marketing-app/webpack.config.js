@@ -20,6 +20,9 @@ module.exports = {
     new ModuleFederationPlugin({
       name: "marketing",
       filename: "remoteEntry.js",
+      remotes: {
+        store: "store@https://stuffy-store-app.onrender.com/remoteEntry.js",
+      },
       exposes: {
         "./FlashSaleBanner": "./src/FlashSaleBanner",
         "./VoucherWallet": "./src/VoucherWallet",
