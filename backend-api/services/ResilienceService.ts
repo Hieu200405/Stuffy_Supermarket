@@ -1,19 +1,27 @@
 import CircuitBreaker from 'opossum';
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 
-/**
- * IMAGE SERVICE CIRCUIT BREAKER
- * Objective: Protect the Gateway from cascading failures in the image-service.
- * Logic: Call Image Service (3009) -> If Timeout/Fail -> Increment Failures -> Open Circuit -> Serve Fallback.
- */
-
+const INTERNAL_SECRET = process.env.STUFFY_INTERNAL_SECRET || 'stuffy_secret_2026';
 const IMAGE_SERVICE_URL = process.env.IMAGE_SERVICE_URL || 'http://localhost:3009';
+
+const generateInternalToken = () => {
+    return jwt.sign({ 
+        iss: 'stuffy-gateway', 
+        scope: 'internal_access' 
+    }, INTERNAL_SECRET, { expiresIn: '60s' });
+};
 
 const fetchOptimizedImage = async (url: string, width: number, quality: number) => {
   const target = `${IMAGE_SERVICE_URL}/optimize?url=${encodeURIComponent(url)}&w=${width}&q=${quality}`;
+  const token = generateInternalToken();
+  
   const response = await axios.get(target, { 
     responseType: 'arraybuffer',
-    timeout: 3000 // If image-service takes > 3s, it's unhealthy
+    timeout: 3000,
+    headers: {
+        'X-Internal-Service-Auth': `Bearer ${token}` // 🛡️ Zero-Trust Inter-service Auth
+    }
   });
   return response.data;
 };
