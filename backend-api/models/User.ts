@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
   cart: { type: Array, default: [] },
+  tenantId: { type: String, required: true, default: 'default_store' },
   createdAt: { type: Date, default: Date.now }
 });
 

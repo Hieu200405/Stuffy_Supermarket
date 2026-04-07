@@ -17,6 +17,7 @@ const reviewSchema = new Schema<IReview>({
 
 export interface IProduct extends Document, Omit<SharedProduct, 'id'> {
   _id: mongoose.Types.ObjectId;
+  tenantId: string;
 }
 
 const ProductSchema = new Schema<IProduct>({
@@ -27,7 +28,8 @@ const ProductSchema = new Schema<IProduct>({
   category: { type: String, required: true, default: "Uncategorized" },
   rating: { type: Number, required: true, default: 0 },
   numReviews: { type: Number, required: true, default: 0 },
-  reviews: [reviewSchema]
+  reviews: [reviewSchema],
+  tenantId: { type: String, required: true, default: 'default_store' }
 }, { timestamps: true });
 
 export default mongoose.model<IProduct>('Product', ProductSchema);

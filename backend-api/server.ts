@@ -13,6 +13,8 @@ import Product from './models/Product';
 import { clearCache } from './redis';
 import { connectRabbitMQ, pubsub } from './rabbitmq';
 import { aiContextSearch } from './ai-search';
+import DiscountRule from './models/DiscountRule';
+import { DiscountEngine } from './services/DiscountEngine';
 // @ts-ignore
 import authRoutes from './routes/auth';
 // @ts-ignore
@@ -62,11 +64,32 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 
+app.post('/api/cart/calculate', async (req: Request, res: Response) => {
+  try {
+    const tenantId = (req.headers['x-tenant-id'] as string) || 'default_store';
+    const { items, total } = req.body;
+    
+    const result = await DiscountEngine.calculateBestDiscount(tenantId, {
+      items,
+      total
+    });
+
+    res.json(result);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
 io.on('connection', (socket) => {
   console.log(`[Socket.IO] Client connected: ${socket.id}`);
+  socket.on('JOIN_TENANT', (tenantId) => {
+    socket.join(tenantId);
+    console.log(`[Socket.IO] Client ${socket.id} joined tenant: ${tenantId}`);
+  });
+
   socket.on('JOIN_CART_SESSION', (sessionCode) => {
     socket.join(sessionCode);
   });
@@ -98,8 +121,8 @@ setInterval(async () => {
     
     console.log(`[Dynamic Pricing] Flash sale on ${targetProduct.name}: ${targetProduct.price} -> ${newPrice}`);
     
-    // Broadcast to all clients (Real-time update)
-    io.emit('DYNAMIC_PRICE_UPDATE', {
+    // Broadcast to specific tenant room (Isolation)
+    io.to(targetProduct.tenantId).emit('DYNAMIC_PRICE_UPDATE', {
       productId: targetProduct._id,
       newPrice,
       originalPrice: targetProduct.price,
@@ -118,16 +141,45 @@ mongoose.connect(mongoURI)
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany([
-        { name: "MacBook Pro M3 Max", price: 3499, category: "Tech" },
-        { name: "Apple Vision Pro", price: 3499, category: "Tech" },
-        { name: "Sony WH-1000XM5", price: 398, category: "Audio" },
-        { name: "PlayStation 5", price: 499, category: "Gaming" }
+        { name: "MacBook Pro M3 Max", price: 3499, category: "Tech", tenantId: 'default_store' },
+        { name: "Apple Vision Pro", price: 3499, category: "Tech", tenantId: 'default_store' },
+        { name: "Sony WH-1000XM5", price: 398, category: "Audio", tenantId: 'default_store' },
+        { name: "PlayStation 5", price: 499, category: "Gaming", tenantId: 'default_store' }
       ]);
+    }
+
+    const ruleCount = await DiscountRule.countDocuments();
+    if (ruleCount === 0) {
+      await DiscountRule.insertMany([
+        { 
+          name: 'High Value Enterprise Order', 
+          tenantId: 'default_store', 
+          logic: { ">": [{ "var": "total" }, 1500] }, 
+          discountType: 'percentage', 
+          discountValue: 15,
+          priority: 10
+        },
+        { 
+          name: 'Tech Enthusiast Weekend', 
+          tenantId: 'default_store', 
+          logic: { 
+            "and": [
+              { "==": [{ "var": "dayOfWeek" }, 6] },
+              { "var": "hasTech" }
+            ]
+          }, 
+          discountType: 'fixed', 
+          discountValue: 100,
+          priority: 5
+        }
+      ]);
+      console.log('[Seed] Advanced Discount Rules configured.');
     }
   });
 
 app.get('/api/products', async (req: Request, res: Response) => {
   try {
+    const tenantId = (req.headers['x-tenant-id'] as string) || 'default_store';
     const pageSize = 8;
     const page = Number(req.query.pageNumber) || 1;
     const keyword = req.query.keyword
@@ -137,8 +189,10 @@ app.get('/api/products', async (req: Request, res: Response) => {
       ? { category: req.query.category as string } 
       : {};
 
-    const count = await Product.countDocuments({ ...keyword, ...categoryQuery });
-    const products = await Product.find({ ...keyword, ...categoryQuery })
+    const query = { ...keyword, ...categoryQuery, tenantId };
+
+    const count = await Product.countDocuments(query);
+    const products = await Product.find(query)
       .limit(pageSize)
       .skip(pageSize * (page - 1));
 
@@ -163,9 +217,12 @@ app.post('/api/ai/context-search', async (req: Request, res: Response) => {
   }
 });
 
-app.post('/api/products', protect, admin, async (req: Request, res: Response) => {
+app.post('/api/products', protect, admin, async (req: any, res: Response) => {
   try {
-    const newProduct = new Product(req.body);
+    const newProduct = new Product({
+        ...req.body,
+        tenantId: req.tenantId
+    });
     await newProduct.save();
     await clearCache('products:*'); // Invalidate listed products
     
