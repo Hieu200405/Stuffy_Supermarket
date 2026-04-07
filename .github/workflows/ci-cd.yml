@@ -16,7 +16,7 @@ jobs:
     # Dùng tính năng matrix để lặp lại việc build tự động cho toàn bộ MFE + Backend
     strategy:
       matrix:
-        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, 3d-viewer-app, backend-api, profile-app, marketing-app, support-app, image-service, recommendation-service]
+        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, 3d-viewer-app, backend-api, profile-app, marketing-app, support-app, image-service, recommendation-service, graphql-gateway]
 
     steps:
       - name: Tải mã nguồn
@@ -92,3 +92,4 @@ jobs:
           trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_SUPPORT }}"
           trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_IMAGE }}"
           trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_RECOM }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_GATEWAY }}"
