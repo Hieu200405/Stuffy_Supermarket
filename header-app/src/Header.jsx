@@ -3,6 +3,8 @@ import AISearchBar from './AISearchBar';
 import NotificationBell from './NotificationBell';
 import SimpleSearchBar from './SimpleSearchBar';
 import LanguageSwitcher from './LanguageSwitcher';
+// @ts-ignore
+import { cartCount } from 'store/signals';
 
 export default function Header() {
   return (
@@ -44,6 +46,18 @@ export default function Header() {
         
         {/* Sync i18n Switcher */}
         <LanguageSwitcher />
+
+        {/* 🛒 Elite Cross-MFE Cart Badge (Signals) */}
+        <div style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          <div style={{ width: '45px', height: '45px', background: '#f8fafc', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #e2e8f0', color: 'var(--text-main)' }}>
+            <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          </div>
+          {cartCount.value > 0 && (
+            <div style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--primary-color)', color: 'white', fontSize: '0.75rem', fontWeight: '900', padding: '1px 7px', borderRadius: '50%', border: '2px solid white', boxShadow: '0 2px 4px rgba(99, 102, 241, 0.4)' }}>
+              {cartCount.value}
+            </div>
+          )}
+        </div>
         
         <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#ffedd5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: '#ea580c', border: '2px solid white', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginLeft: '10px' }}>NV</div>
       </div>
