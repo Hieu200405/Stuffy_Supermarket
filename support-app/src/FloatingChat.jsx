@@ -63,6 +63,7 @@ export default function FloatingChat() {
       {!isOpen && (
         <button 
           onClick={() => setIsOpen(true)}
+          className="ai-copilot-toggle"
           style={{ width: '60px', height: '60px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '50%', cursor: 'pointer', fontSize: '1.8rem', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 10px 25px rgba(99,102,241,0.4)', transition: 'transform 0.2s' }}
           onMouseOver={e=>e.currentTarget.style.transform='scale(1.1)'}
           onMouseOut={e=>e.currentTarget.style.transform='scale(1)'}
@@ -73,7 +74,7 @@ export default function FloatingChat() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div style={{ width: '380px', height: '550px', background: 'white', borderRadius: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--border-light)' }}>
+        <div className="ai-copilot-window" style={{ width: '380px', height: '550px', background: 'white', borderRadius: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--border-light)' }}>
           {/* Header */}
           <div style={{ background: 'var(--primary-color)', padding: '20px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -87,7 +88,7 @@ export default function FloatingChat() {
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px', background: '#f8fafc' }}>
+          <div className="chat-messages" style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px', background: '#f8fafc' }}>
              {messages.map((m, i) => (
                 <div key={i} style={{ 
                   alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', 
