@@ -7,6 +7,7 @@ import ProductSkeleton from "design_system/ProductSkeleton";
 import { io } from "socket.io-client";
 // @ts-ignore
 import { useI18nStore } from "store/i18n";
+import { getOptimizedImage } from "./utils/image";
 
 // Lazy-load the 3D viewer (2MB+) — only fetched when user clicks "View in 3D"
 const Viewer3D = React.lazy(() => import("viewer/Viewer"));
@@ -206,7 +207,7 @@ export default function ProductList() {
                     </button>
 
                     <div style={{ background: '#f1f5f9', borderRadius: '12px', padding: '20px', marginBottom: '15px', display: 'flex', justifyContent: 'center', transition: 'all 0.3s', cursor: 'pointer' }} onClick={() => navigate(`/product/${p.id}`)}>
-                      <img src={p.image} alt={p.name} style={{ width: "160px", height: "160px", objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                      <img src={getOptimizedImage(p.image, 320, 80)} alt={p.name} style={{ width: "160px", height: "160px", objectFit: 'contain', mixBlendMode: 'multiply' }} />
                     </div>
                     
                     <h4 style={{ margin: "0 0 4px 0", fontSize: "1.2rem", fontWeight: '700', color: 'var(--text-main)', minHeight: '50px', cursor: 'pointer' }} onClick={() => navigate(`/product/${p.id}`)}>{p.name}</h4>
