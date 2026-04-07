@@ -14,11 +14,12 @@ import {
   fieldExtensionsEstimator 
 } from 'graphql-query-complexity';
 
-// Setup Redis for Rate Limiting (Resilient Config)
+// Setup Redis for Rate Limiting (Ultra-Resilient Config)
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-  maxRetriesPerRequest: 3,
+  maxRetriesPerRequest: null, // Don't crash if redis is missing
   retryStrategy: (times) => Math.min(times * 100, 3000),
   showFriendlyErrorStack: true,
+  enableOfflineQueue: true, // Allow commands to be queued while reconnecting
 });
 
 redis.on('error', (err) => console.error('[Gateway] ❌ Redis Connection Error:', err.message));
