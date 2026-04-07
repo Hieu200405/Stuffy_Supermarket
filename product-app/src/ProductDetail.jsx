@@ -40,10 +40,11 @@ export default function ProductDetail() {
     // Fetch product details
     fetch(`https://stuffy-backend-api.onrender.com/api/products/${id}`)
       .then(res => res.json())
-      .then(data => {
+      .then(async (data) => {
         if (!data.error) {
           setProduct(data);
-          // Fetch similar products based on category
+          
+          // 1. Fetch similar products by Category (Static logic)
           fetch(`https://stuffy-backend-api.onrender.com/api/products?category=${data.category}&pageNumber=1`)
             .then(res => res.json())
             .then(simData => {
@@ -51,6 +52,19 @@ export default function ProductDetail() {
                 setSimilarProducts(simData.products.filter(p => p.id !== data.id).slice(0, 4));
               }
             });
+
+          // 2. 🚀 Fetch RECOMMENDATIONS from REAL-TIME Microservice (Collaborative Filtering)
+          try {
+             const recomRes = await fetch(`http://localhost:3010/api/recommendations/${id}`);
+             const recomData = await recomRes.json();
+             if (recomData.suggested && recomData.suggested.length > 0) {
+                const detailPromises = recomData.suggested.slice(0, 4).map(s => 
+                   fetch(`https://stuffy-backend-api.onrender.com/api/products/${s.id}`).then(r => r.json())
+                );
+                const results = await Promise.all(detailPromises);
+                setRecommendedProducts(results.filter(r => !r.error));
+             }
+          } catch (err) { console.warn("Recommendation service offline."); }
         }
         setLoading(false);
       })
@@ -261,7 +275,31 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Tầng 3: Cross Selling */}
+      {/* Tầng 3: Real-time Recommendations (AI Driven) */}
+      {recommendedProducts.length > 0 && (
+        <div style={{ marginBottom: '60px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+             <h3 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '800' }}>People also Viewed</h3>
+             <span style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'white', fontSize: '0.7rem', fontWeight: '800', padding: '4px 12px', borderRadius: '99px' }}>AI RECOMMENDATION</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "20px" }}>
+            {recommendedProducts.map(p => (
+              <div key={p.id} className="ds-glass-card" style={{ padding: '20px', borderRadius: '16px', position: 'relative', cursor: 'pointer', transition: 'all 0.2s', border: '1px solid transparent' }} onClick={() => navigate(`/product/${p.id}`)} onMouseOver={e=>e.currentTarget.style.borderColor='var(--primary-color)'} onMouseOut={e=>e.currentTarget.style.borderColor='transparent'}>
+                <div style={{ background: '#f1f5f9', borderRadius: '12px', padding: '15px', marginBottom: '15px', display: 'flex', justifyContent: 'center' }}>
+                  <img src={p.image} alt={p.name} style={{ width: "120px", height: "120px", objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                </div>
+                <h4 style={{ margin: "0 0 8px 0", fontSize: "1.05rem", fontWeight: '700', color: 'var(--text-main)', minHeight: '40px' }}>{p.name}</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: "800", color: "var(--primary-color)" }}>${p.price}</span>
+                  {renderStars(p.rating || 0)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tầng 4: Cross Selling (Static Category-based) */}
       {similarProducts.length > 0 && (
         <div>
           <h3 style={{ margin: '0 0 25px 0', fontSize: '1.6rem', fontWeight: '800' }}>Similar Products</h3>
@@ -279,7 +317,7 @@ export default function ProductDetail() {
                 <div style={{ background: '#f1f5f9', borderRadius: '12px', padding: '15px', marginBottom: '15px', display: 'flex', justifyContent: 'center' }}>
                   <img src={p.image} alt={p.name} style={{ width: "120px", height: "120px", objectFit: 'contain', mixBlendMode: 'multiply' }} />
                 </div>
-                <h4 style={{ margin: "0 0 8px 0", fontSize: "1.05rem", fontWeight: '700', color: 'var(--text-main)' }}>{p.name}</h4>
+                <h4 style={{ margin: "0 0 8px 0", fontSize: "1.05rem", fontWeight: '700', color: 'var(--text-main)', minHeight: '40px' }}>{p.name}</h4>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontWeight: "800", color: "var(--primary-color)" }}>${p.price}</span>
                   {renderStars(p.rating || 0)}
