@@ -1,3 +1,4 @@
+import "./tracing";
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';

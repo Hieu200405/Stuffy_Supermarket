@@ -111,6 +111,14 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # Web UI
+      - "4318:4318"   # OTLP HTTP
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
 volumes:
   mongo_data:
   redis_data:
