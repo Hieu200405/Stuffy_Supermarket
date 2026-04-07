@@ -9,7 +9,7 @@ RUN npm install --workspace=support-app --include-workspace-root
 
 COPY support-app ./support-app
 WORKDIR /app/support-app
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM public.ecr.aws/docker/library/nginx:alpine
 COPY --from=builder /app/support-app/dist /usr/share/nginx/html

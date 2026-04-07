@@ -9,7 +9,7 @@ RUN npm install --workspace=profile-app --include-workspace-root
 
 COPY profile-app ./profile-app
 WORKDIR /app/profile-app
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM public.ecr.aws/docker/library/nginx:alpine
 COPY --from=builder /app/profile-app/dist /usr/share/nginx/html

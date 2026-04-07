@@ -9,7 +9,7 @@ RUN npm install --workspace=marketing-app --include-workspace-root
 
 COPY marketing-app ./marketing-app
 WORKDIR /app/marketing-app
-RUN npx webpack --mode production
+RUN npm run build
 
 FROM public.ecr.aws/docker/library/nginx:alpine
 COPY --from=builder /app/marketing-app/dist /usr/share/nginx/html
