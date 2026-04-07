@@ -4,7 +4,9 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "start": "ts-node --esm src/server.ts",
+    "build": "tsc",
+    "start": "node src/server.js",
+    "dev": "ts-node --esm src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
