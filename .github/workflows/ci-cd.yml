@@ -16,7 +16,7 @@ jobs:
     # Dùng tính năng matrix để lặp lại việc build tự động cho toàn bộ MFE + Backend
     strategy:
       matrix:
-        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, 3d-viewer-app, backend-api, profile-app, marketing-app, support-app]
+        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, 3d-viewer-app, backend-api, profile-app, marketing-app, support-app, image-service, recommendation-service]
 
     steps:
       - name: Tải mã nguồn
@@ -81,6 +81,8 @@ jobs:
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_PROFILE }} > /dev/null || true
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_MARKETING }} > /dev/null || true
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_SUPPORT }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_IMAGE }} > /dev/null || true
+          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_RECOM }} > /dev/null || true
 
   visual-regression-test:
     needs: deploy-to-render
