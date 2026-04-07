@@ -13,7 +13,14 @@ export const loadMfeManifest = async () => {
         return {
             store: "https://stuffy-store-app.onrender.com/remoteEntry.js",
             header: "https://stuffy-header-app.onrender.com/remoteEntry.js",
-            product: "https://stuffy-product-app.onrender.com/remoteEntry.js"
+            product: "https://stuffy-product-app.onrender.com/remoteEntry.js",
+            cart: "https://stuffy-cart-app.onrender.com/remoteEntry.js",
+            admin: "https://stuffy-admin-app.onrender.com/remoteEntry.js",
+            profile: "https://stuffy-profile-app.onrender.com/remoteEntry.js",
+            marketing: "https://stuffy-marketing-app.onrender.com/remoteEntry.js",
+            support: "https://stuffy-support-app.onrender.com/remoteEntry.js",
+            design_system: "https://stuffy-design-system-app.onrender.com/remoteEntry.js",
+            viewer: "https://stuffy-3d-viewer-app.onrender.com/remoteEntry.js"
         };
     }
 };
