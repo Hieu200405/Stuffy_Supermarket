@@ -12,6 +12,7 @@ export const connectRabbitMQ = async () => {
         // Define Queues
         await channel.assertQueue('INVENTORY_SYNC', { durable: true });
         await channel.assertQueue('EMAIL_NOTIFICATIONS', { durable: true });
+        await channel.assertQueue('user_behavior_tracking', { durable: true });
         
         console.log(`[RabbitMQ] Connected and queues initialized.`);
     } catch (err) {

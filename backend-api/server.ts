@@ -234,6 +234,21 @@ app.get('/api/products', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/api/products/:id', async (req: Request, res: Response) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    // Track user behavior for Recommendations (Collaborative Filtering)
+    const userId = (req.headers['x-user-id'] as string) || 'guest_' + req.ip;
+    pubsub.publish('user_behavior_tracking', { userId, productId: product._id });
+
+    res.json(product);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post('/api/ai/context-search', async (req: Request, res: Response) => {
   try {
     const { query } = req.body;
