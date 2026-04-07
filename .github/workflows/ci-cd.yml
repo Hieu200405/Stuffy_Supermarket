@@ -81,3 +81,40 @@ jobs:
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_PROFILE }} > /dev/null || true
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_MARKETING }} > /dev/null || true
           curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_SUPPORT }} > /dev/null || true
+
+  visual-regression-test:
+    needs: deploy-to-render
+    runs-on: ubuntu-latest
+    if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Dev')
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: |
+          cd visual-tests
+          npm install
+
+      - name: Install Playwright Browsers
+        run: |
+          cd visual-tests
+          npx playwright install --with-deps chromium
+
+      - name: Run Visual Tests
+        env:
+          BASE_URL: https://stuffy-supermarket.onrender.com
+        run: |
+          cd visual-tests
+          npm test
+
+      - name: Upload Test Results (Screenshots)
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: visual-test-results
+          path: visual-tests/test-results/
