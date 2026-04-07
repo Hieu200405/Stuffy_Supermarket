@@ -32,11 +32,13 @@ module.exports = {
         "./store": "./src/store",
         "./api": "./src/api",
         "./i18n": "./src/i18n",
+        "./signals": "./src/GlobalSignals",
       },
       shared: {
         react: { singleton: true, requiredVersion: false },
         "react-dom": { singleton: true, requiredVersion: false },
-        zustand: { singleton: true, requiredVersion: false }
+        zustand: { singleton: true, requiredVersion: false },
+        "@preact/signals-react": { singleton: true, requiredVersion: false }
       },
     }),
     new HtmlWebpackPlugin({ template: "./public/index.html" }),
