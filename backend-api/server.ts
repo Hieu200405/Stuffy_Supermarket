@@ -15,6 +15,7 @@ import { connectRabbitMQ, pubsub } from './rabbitmq';
 import { aiContextSearch } from './ai-search';
 import DiscountRule from './models/DiscountRule';
 import { DiscountEngine } from './services/DiscountEngine';
+import { PaymentService } from './services/PaymentService';
 // @ts-ignore
 import authRoutes from './routes/auth';
 // @ts-ignore
@@ -76,6 +77,31 @@ app.post('/api/cart/calculate', async (req: Request, res: Response) => {
 
     res.json(result);
   } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/payments/pay', async (req: Request, res: Response) => {
+  try {
+    const tenantId = (req.headers['x-tenant-id'] as string) || 'default_store';
+    const idempotencyKey = req.headers['x-idempotency-key'] as string;
+    
+    if (!idempotencyKey) {
+        return res.status(400).json({ error: 'Idempotency Key (x-idempotency-key) is required for financial safety.' });
+    }
+
+    const { amount, currency = 'usd' } = req.body;
+    
+    const result = await PaymentService.createPaymentIntent(
+      tenantId, 
+      amount, 
+      currency, 
+      idempotencyKey
+    );
+
+    res.json(result);
+  } catch (e: any) {
+    Sentry.captureException(e);
     res.status(500).json({ error: e.message });
   }
 });
