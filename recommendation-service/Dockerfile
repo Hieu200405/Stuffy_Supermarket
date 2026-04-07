@@ -1,8 +1,8 @@
 FROM node:20-alpine
 WORKDIR /app
-COPY image-service/package*.json ./
+COPY recommendation-service/package*.json ./
 RUN npm install
-COPY image-service .
+COPY recommendation-service .
 RUN npm run build
-EXPOSE 3009
+EXPOSE 3010
 CMD ["npm", "start"]

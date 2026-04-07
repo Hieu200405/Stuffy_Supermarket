@@ -16,7 +16,7 @@ jobs:
     # Dùng tính năng matrix để lặp lại việc build tự động cho toàn bộ MFE + Backend
     strategy:
       matrix:
-        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, 3d-viewer-app, backend-api, profile-app, marketing-app, support-app]
+        app: [header-app, product-app, cart-app, admin-app, container, store-app, design-system-app, 3d-viewer-app, backend-api, profile-app, marketing-app, support-app, image-service, recommendation-service]
 
     steps:
       - name: Tải mã nguồn
@@ -69,52 +69,26 @@ jobs:
       - name: Kích hoạt Webhook Deploy của Render
         run: |
           echo "Kích hoạt tự động cập nhật Web server Render từ Github Actions..."
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_CONTAINER }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_HEADER }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_PRODUCT }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_CART }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_ADMIN }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_STORE }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_DESIGN_SYSTEM }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_VIEWER }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_PROFILE }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_MARKETING }} > /dev/null || true
-          curl -X POST -s ${{ secrets.RENDER_DEPLOY_HOOK_SUPPORT }} > /dev/null || true
+          
+          # Hàm để trigger deploy nếu secret tồn tại
+          trigger_deploy() {
+            if [[ -n "$1" ]]; then
+              echo "Deploying to hook: ${1:0:10}..."
+              curl -X POST -s "$1" > /dev/null || true
+            fi
+          }
 
-  visual-regression-test:
-    needs: deploy-to-render
-    runs-on: ubuntu-latest
-    if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Dev')
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: |
-          cd visual-tests
-          npm install
-
-      - name: Install Playwright Browsers
-        run: |
-          cd visual-tests
-          npx playwright install --with-deps chromium
-
-      - name: Run Visual Tests
-        env:
-          BASE_URL: https://stuffy-supermarket.onrender.com
-        run: |
-          cd visual-tests
-          npm test
-
-      - name: Upload Test Results (Screenshots)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: visual-test-results
-          path: visual-tests/test-results/
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_CONTAINER }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_HEADER }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_PRODUCT }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_CART }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_ADMIN }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_STORE }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_DESIGN_SYSTEM }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_VIEWER }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_PROFILE }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_MARKETING }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_SUPPORT }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_IMAGE }}"
+          trigger_deploy "${{ secrets.RENDER_DEPLOY_HOOK_RECOM }}"

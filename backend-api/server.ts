@@ -19,6 +19,7 @@ import { PaymentService } from './services/PaymentService';
 import { AiCopilot } from './services/AiCopilot';
 import { ImageGenService } from './services/ImageGenService';
 import { getResilientImage } from './services/ResilienceService';
+import { Web3LoyaltyService } from './services/Web3LoyaltyService';
 import MfeModule from './models/MfeModule';
 // @ts-ignore
 import authRoutes from './routes/auth';
@@ -327,6 +328,19 @@ app.get('/api/images/proxy', async (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'image/webp');
     res.setHeader('Cache-Control', 'public, max-age=31536000');
     res.send(result);
+  } catch (e: any) {
+    Sentry.captureException(e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/loyalty/vip-check', async (req: Request, res: Response) => {
+  try {
+    const { address } = req.query;
+    if (!address) return res.status(400).json({ error: 'wallet address is required' });
+
+    const isVipNFT = await Web3LoyaltyService.checkVipNftOwnership(address as string);
+    res.json({ isVipNFT });
   } catch (e: any) {
     Sentry.captureException(e);
     res.status(500).json({ error: e.message });
