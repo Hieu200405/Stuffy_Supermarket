@@ -1,11 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
+// @ts-ignore
+import { isDarkMode } from "store/signals";
 
 export default function FlashSaleBanner() {
   const [timeLeft, setTimeLeft] = useState(0); 
+  const [bannerBg, setBannerBg] = useState("");
   const socketRef = useRef(null);
 
   useEffect(() => {
+    // 🎨 Dynamic AI Visual Fetch
+    const theme = isDarkMode.value ? 'dark' : 'bright';
+    fetch(`https://stuffy-backend-api.onrender.com/api/marketing/dynamic-visual?productName=High%20End%20Gaming%20PC&theme=${theme}`)
+      .then(res => res.json())
+      .then(data => setBannerBg(data.imageUrl))
+      .catch(err => console.error("Dynamic Banner Error:", err));
+
     // Kết nối tới backend socket
     socketRef.current = io("https://stuffy-backend-api.onrender.com");
     
@@ -30,16 +40,19 @@ export default function FlashSaleBanner() {
   return (
     <div style={{
       width: '100%',
-      background: 'linear-gradient(45deg, #ef4444, #f97316)',
-      borderRadius: '16px',
-      padding: '25px 30px',
+      backgroundImage: bannerBg ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url(${bannerBg})` : 'linear-gradient(45deg, #ef4444, #f97316)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      borderRadius: '24px',
+      padding: '40px 50px',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
       boxSizing: 'border-box',
-      boxShadow: '0 10px 25px rgba(239, 68, 68, 0.3)',
+      boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
       color: 'white',
-      marginBottom: '30px'
+      marginBottom: '40px',
+      transition: 'all 0.8s ease'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         <div style={{ fontSize: '2.5rem' }}>⚡</div>

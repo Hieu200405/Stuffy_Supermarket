@@ -17,6 +17,7 @@ import DiscountRule from './models/DiscountRule';
 import { DiscountEngine } from './services/DiscountEngine';
 import { PaymentService } from './services/PaymentService';
 import { AiCopilot } from './services/AiCopilot';
+import { ImageGenService } from './services/ImageGenService';
 // @ts-ignore
 import authRoutes from './routes/auth';
 // @ts-ignore
@@ -267,6 +268,19 @@ app.post('/api/ai/copilot/chat', async (req: Request, res: Response) => {
     const result = await AiCopilot.handleChat(query, tenantId);
     
     res.json(result);
+  } catch (e: any) {
+    Sentry.captureException(e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/marketing/dynamic-visual', async (req: Request, res: Response) => {
+  try {
+    const { productName, theme = 'bright' } = req.query;
+    if (!productName) return res.status(400).json({ error: 'productName is required' });
+
+    const imageUrl = await ImageGenService.generateThemedVisual(productName as string, theme as any);
+    res.json({ imageUrl });
   } catch (e: any) {
     Sentry.captureException(e);
     res.status(500).json({ error: e.message });
