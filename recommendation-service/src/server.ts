@@ -37,8 +37,32 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const RABBIT_URL = process.env.RABBIT_URL || 'amqp://localhost';
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/stuffy_db';
 
-const redis = createClient({ url: REDIS_URL });
-redis.connect();
+const redis = createClient({ 
+    url: REDIS_URL,
+    socket: {
+        reconnectStrategy: (retries) => {
+            if (retries > 10) {
+                console.warn('[Redis] 🛑 Maximum reconnection attempts reached. Giving up.');
+                return false; // Stop retrying
+            }
+            return Math.min(retries * 100, 3000); // Exponential backoff
+        }
+    }
+});
+
+redis.on('error', (err) => console.error('[Redis] ❌ Connection Error:', err));
+
+// Secure Connection Logic (Non-blocking crash prevention)
+const connectServices = async () => {
+    try {
+        await redis.connect();
+        console.log('[Redis] ✅ Connected successfully.');
+    } catch (e) {
+        console.error('[Redis] ⚠️ Fallback: Continuing without Redis. Some features will be limited.');
+    }
+};
+
+connectServices();
 
 // 1. RECOMMENDATION ENGINE (Collaborative Filtering Logic)
 async function trackInteraction(userId: string, productId: string) {
@@ -63,6 +87,10 @@ async function trackInteraction(userId: string, productId: string) {
 // 2. RABBITMQ CONSUMER (Real-time Event Processing)
 async function startConsumer() {
     try {
+        if (!process.env.RABBIT_URL) {
+            console.warn("[Amqp] ⚠️ Missing RABBIT_URL. Consumer not started.");
+            return;
+        }
         const conn = await amqp.connect(RABBIT_URL);
         const channel = await conn.createChannel();
         const queue = 'user_behavior_tracking';
@@ -73,11 +101,13 @@ async function startConsumer() {
         channel.consume(queue, (msg) => {
             if (msg) {
                 const { userId, productId } = JSON.parse(msg.content.toString());
-                trackInteraction(userId, productId);
+                trackInteraction(userId, productId).catch(e => console.error(e));
                 channel.ack(msg);
             }
         });
-    } catch (err) { console.error('[RabbitMQ] Error:', err); }
+    } catch (err) { 
+        console.error('[RabbitMQ] ❌ Failure: Service will operate without real-time tracking.', err);
+    }
 }
 
 // 3. RECOMMENDATION API
