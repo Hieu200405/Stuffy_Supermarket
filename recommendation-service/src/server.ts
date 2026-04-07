@@ -37,7 +37,18 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const RABBIT_URL = process.env.RABBIT_URL || 'amqp://localhost';
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/stuffy_db';
 
-const redis = createClient({ url: REDIS_URL });
+const redis = createClient({ 
+    url: REDIS_URL,
+    socket: {
+        reconnectStrategy: (retries) => {
+            if (retries > 10) {
+                console.warn('[Redis] 🛑 Maximum reconnection attempts reached. Giving up.');
+                return false; // Stop retrying
+            }
+            return Math.min(retries * 100, 3000); // Exponential backoff
+        }
+    }
+});
 
 redis.on('error', (err) => console.error('[Redis] ❌ Connection Error:', err));
 
