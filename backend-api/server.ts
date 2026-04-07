@@ -13,6 +13,8 @@ import Product from './models/Product';
 import { clearCache } from './redis';
 import { connectRabbitMQ, pubsub } from './rabbitmq';
 import { aiContextSearch } from './ai-search';
+import DiscountRule from './models/DiscountRule';
+import { DiscountEngine } from './services/DiscountEngine';
 // @ts-ignore
 import authRoutes from './routes/auth';
 // @ts-ignore
@@ -61,6 +63,22 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+
+app.post('/api/cart/calculate', async (req: Request, res: Response) => {
+  try {
+    const tenantId = (req.headers['x-tenant-id'] as string) || 'default_store';
+    const { items, total } = req.body;
+    
+    const result = await DiscountEngine.calculateBestDiscount(tenantId, {
+      items,
+      total
+    });
+
+    res.json(result);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
@@ -128,6 +146,34 @@ mongoose.connect(mongoURI)
         { name: "Sony WH-1000XM5", price: 398, category: "Audio", tenantId: 'default_store' },
         { name: "PlayStation 5", price: 499, category: "Gaming", tenantId: 'default_store' }
       ]);
+    }
+
+    const ruleCount = await DiscountRule.countDocuments();
+    if (ruleCount === 0) {
+      await DiscountRule.insertMany([
+        { 
+          name: 'High Value Enterprise Order', 
+          tenantId: 'default_store', 
+          logic: { ">": [{ "var": "total" }, 1500] }, 
+          discountType: 'percentage', 
+          discountValue: 15,
+          priority: 10
+        },
+        { 
+          name: 'Tech Enthusiast Weekend', 
+          tenantId: 'default_store', 
+          logic: { 
+            "and": [
+              { "==": [{ "var": "dayOfWeek" }, 6] },
+              { "var": "hasTech" }
+            ]
+          }, 
+          discountType: 'fixed', 
+          discountValue: 100,
+          priority: 5
+        }
+      ]);
+      console.log('[Seed] Advanced Discount Rules configured.');
     }
   });
 
