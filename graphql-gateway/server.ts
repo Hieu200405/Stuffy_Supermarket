@@ -5,6 +5,28 @@ import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
+import { rateLimit } from 'express-rate-limit';
+import { RedisStore } from 'rate-limit-redis';
+import Redis from 'ioredis';
+import { 
+  getComplexity, 
+  simpleEstimator, 
+  fieldExtensionsEstimator 
+} from 'graphql-query-complexity';
+
+// Setup Redis for Rate Limiting
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: new RedisStore({
+    // @ts-ignore
+    sendCommand: (...args: string[]) => redis.call(...args),
+  }),
+});
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -13,26 +35,49 @@ const httpServer = http.createServer(app);
 const gateway = new ApolloGateway({
   supergraphSdl: new IntrospectAndCompose({
     subgraphs: [
-      { name: 'products', url: 'http://localhost:5000/graphql' },
-      // Other subgraphs like 'users', 'orders' can be added here in the future
+      { name: 'products', url: process.env.PRODUCTS_SERVICE_URL || 'http://localhost:5000/graphql' },
     ],
   }),
 });
 
 const server = new ApolloServer({
   gateway,
+  plugins: [
+    {
+      async requestDidStart() {
+        return {
+          async didResolveOperation({ request, document, schema }) {
+            const complexity = getComplexity({
+              schema,
+              operationName: request.operationName,
+              query: document,
+              variables: request.variables,
+              estimators: [
+                fieldExtensionsEstimator(),
+                simpleEstimator({ defaultComplexity: 1 }),
+              ],
+            });
+
+            const MAX_COMPLEXITY = 50;
+            if (complexity > MAX_COMPLEXITY) {
+              throw new Error(
+                `Query is too complex: ${complexity}. Maximum complexity allowed is ${MAX_COMPLEXITY}.`
+              );
+            }
+            console.log(`[Security] Query complexity: ${complexity}`);
+          },
+        };
+      },
+    },
+  ],
 });
 
-const startServer = async () => {
-    await server.start();
-    app.use(
-        '/graphql',
-        cors<cors.CorsRequest>(),
-        express.json(),
-        expressMiddleware(server) as any
-    );
-
-    const PORT = 4000;
+async function startServer() {
+  await server.start();
+  app.use(cors<cors.CorsRequest>(), express.json(), limiter);
+  app.use('/graphql', expressMiddleware(server) as any);
+  
+  const PORT = process.env.PORT || 4000;
     httpServer.listen(PORT, () => {
         console.log(`[GraphQL Gateway] Running at http://localhost:${PORT}/graphql`);
     });
