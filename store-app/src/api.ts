@@ -1,7 +1,14 @@
 import { Product, User } from "@stuffy/types";
 
-const BASE_URL = "https://stuffy-backend-api.onrender.com/api";
-const GRAPHQL_URL = "http://localhost:4000/graphql";
+const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('onrender.com');
+
+const BASE_URL = isProduction 
+  ? "https://stuffy-backend-api.onrender.com/api" 
+  : "http://localhost:5000/api";
+
+const GRAPHQL_URL = isProduction 
+  ? "https://stuffy-graphql-gateway.onrender.com/graphql" 
+  : "http://localhost:4000/graphql";
 
 const apiRequest = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
   const settings = {
