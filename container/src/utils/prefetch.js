@@ -20,11 +20,16 @@ export const prefetchRemote = (name, url) => {
   document.head.appendChild(script);
 };
 
-// Map of remotes and their entry points
+// Map of remotes and their entry points (Cloud-Sync)
 export const REMOTE_MAP = {
-  cart: "http://localhost:3003/remoteEntry.js",
-  admin: "http://localhost:3004/remoteEntry.js",
-  profile: "http://localhost:3007/remoteEntry.js",
-  product: "http://localhost:3002/remoteEntry.js",
-  support: "http://localhost:3008/remoteEntry.js"
+  header: "https://stuffy-header-app.onrender.com/remoteEntry.js",
+  product: "https://stuffy-product-app.onrender.com/remoteEntry.js",
+  cart: "https://stuffy-cart-app.onrender.com/remoteEntry.js",
+  admin: "https://stuffy-admin-app.onrender.com/remoteEntry.js",
+  store: "https://stuffy-store-app.onrender.com/remoteEntry.js",
+  profile: "https://stuffy-profile-app.onrender.com/remoteEntry.js",
+  marketing: "https://stuffy-marketing-app.onrender.com/remoteEntry.js",
+  support: "https://stuffy-support-app.onrender.com/remoteEntry.js",
+  design_system: "https://stuffy-design-system-app.onrender.com/remoteEntry.js",
+  viewer: "https://stuffy-3d-viewer-app.onrender.com/remoteEntry.js",
 };
