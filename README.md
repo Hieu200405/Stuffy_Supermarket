@@ -1,67 +1,90 @@
-# Stuffy Supermarket - Enterprise Micro-frontends E-commerce
+# 🛒 Stuffy Supermarket - Elite Micro Frontends & AI Ecosystem
 
-Stuffy Supermarket is a modern, high-performance e-commerce platform built with a robust Micro-frontends (MFE) architecture. This project demonstrates advanced engineering patterns, including real-time synchronization, 3D interactivity, and a standardized design system, all managed within a strictly typed monorepo environment.
+![Master Architecture](https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1200&auto=format&fit=crop)
 
-## Architecture Overview
+**Stuffy Supermarket** không chỉ là một ứng dụng thương mại điện tử; đây là một **Hệ sinh thái Enterprise SaaS** thế hệ mới, được xây dựng trên kiến trúc **Micro Frontends (MFE)** lộng lẫy và bộ não **Agentic AI**. Một giải pháp bán lẻ Elite với khả năng mở rộng (scalability) và khả năng phục hồi (resilience) tuyệt đối trên Cloud.
 
-The system is orchestrated using Webpack 5 Module Federation, allowing independent teams to develop, test, and deploy sub-applications (remotes) that are seamlessly integrated into a main App Shell (host) at runtime.
+---
 
-### Core Applications
-- **Container (App Shell)**: The primary entry point (Port 3000) that dynamically orchestrates and loads all micro-frontends using React Suspense.
-- **Header App**: Provides centralized navigation, AI-powered search, and a global language switcher (Port 3001).
-- **Product App**: Handles the complex product catalog, category filtering, and 3D AR product visualization (Port 3002).
-- **Cart App**: Manages local and server-synced shopping cart states with real-time price calculations (Port 3003).
-- **Admin App**: An enterprise-grade dashboard for product management and inventory tracking (Port 3004).
-- **Store App**: A headless utility MFE providing centralized API services (TypeScript), global state (Zustand), and i18n synchronization (Port 3005).
-- **Design System**: A shared UI library containing reusable components like GlassCard and Button, documented with Storybook (Port 3006).
-- **3D Viewer**: A heavy-duty Three.js engine for interactive product exploration, lazy-loaded on demand (Port 3007).
+## 🏗️ Kiến trúc Tổng thể (Elite Mesh)
 
-## Key Technical Features
+Dự án sử dụng mô hình **Distributed Monorepo** (chia nhỏ module tại Runtime, quản lý tập trung tại Build-time), giao tiếp qua **GraphQL Federation Gateway** và **Message Broker (RabbitMQ)**.
 
-### Monorepo and Build System
-- **Turborepo Management**: Orchestrates build, lint, and start commands across all packages with high-performance caching.
-- **TypeScript Integration**: Full end-to-end type safety from the Backend API (Node.js) through the Store App utility layer to the Frontend components.
-- **Shared Configuration**: Unified ESLint and Prettier rules defined in `packages/config` to ensure code consistency across all micro-frontends.
+### 🧩 15+ Micro Frontends & Microservices Catalog:
+| Module | Vai trò | Công nghệ | URL (Production) |
+| :--- | :--- | :--- | :--- |
+| **`container`** | **App Shell / Orchestrator**: Trái tim điều phối Registry & PWA. | Webpack MF, React | [Link](https://stuffy-container.onrender.com) |
+| **`graphql-gateway`** | **Data Hub**: Hợp nhất dữ liệu từ tất cả các Subgraphs. | Apollo Gateway, OTEL | [Link](https://stuffy-graphql-gateway.onrender.com) |
+| **`backend-api`** | **Core API (REST/GQL)**: Quản lý Auth, Products & Governance. | Node.js, MongoDB, Sentry | [Link](https://stuffy-backend-api.onrender.com) |
+| **`store-app`** | **Elite Storefront**: Quản lý trạng thái chia sẻ (Elite State). | Zustand, Framer Motion | [Link](https://stuffy-store-app.onrender.com) |
+| **`image-service`** | **Image Edge Service**: Tối ưu hóa WebP & Resizing thời gian thực. | Sharp, Redis, Crypto | [Link](https://stuffy-image-service.onrender.com) |
+| **`recom-service`** | **AI Recom Service**: Gợi ý sản phẩm qua RabbitMQ & Redis. | Socket.IO, BullMQ | [Link](https://stuffy-recom.onrender.com) |
+| **`design-system`** | **Shared Core**: Thư viện UI (Glassmorphism), Styles, Hooks. | Vanilla CSS, React | [Link](https://stuffy-design-system-app.onrender.com) |
+| **`3d-viewer-app`** | **AR Component**: Trải nghiệm quan sát sản phẩm 3D thực tế ảo. | Three.js, React-Three-Fiber | [Link](https://stuffy-3d-viewer-app.onrender.com) |
+| **...và các MFE khác** | `header`, `cart`, `admin`, `profile`, `marketing`, `support`. | React, Webpack MF | [Link-tương-ứng] |
 
-### Advanced Capabilities
-- **Module Federation (MFE)**: True isolation of development environments with dynamic remote URL loading via runtime configuration.
-- **Federated GraphQL Gateway (BFF)**: Centralized entry point (Port 4000) orchestrating multiple subgraphs (Products, etc.) for optimized data fetching.
-- **Real-time Synchronization**: Socket.io integration for instant price updates, flash sale countdowns, and cross-device cart syncing.
-- **State Management**: Centralized store patterns using Zustand, accessible across different micro-frontends via the Store App.
-- **Internationalization (i18n)**: Instant system-wide language switching (English/Vietnamese) without page reloads.
-- **Error Tracking**: Full-stack observability with Sentry integrated into both the App Shell and the Backend API.
-- **PWA and Offline Support**: Service Worker integration using Workbox to ensure fast load times and basic offline functionality.
+---
 
-### Performance and DevOps
-- **Kubernetes Orchestration**: Production-ready Helm charts located in `/kubernetes` with **Horizontal Pod Autoscaling (HPA)** for dynamic scaling based on traffic.
-- **Multi-stage Docker Builds**: Optimized Docker images using Alpine Linux and Nginx to minimize deployment footprint and speed up cold starts.
-- **CI/CD Pipeline**: Automated GitHub Actions workflow utilizing matrix strategies for concurrent building and deployment of all ecosystem apps.
-- **Dynamic Optimization**: Code splitting and lazy loading of heavy modules (like the 3D Engine) to maintain high Lighthouse scores.
+## 🌟 Tính năng Elite & Khác biệt Kỹ thuật
 
-## Getting Started
+### 🧠 1. Agentic AI Shopping Copilot (Google Gemini Inside)
+*   Sử dụng **Google Gemini Core** để tư vấn sản phẩm cá nhân hóa.
+*   **Contextual Search**: Tìm kiếm sản phẩm thông minh theo ngữ cảnh người dùng.
 
-### Prerequisites
-- Node.js (v18 or higher)
-- Docker Desktop (for containerized environment)
+### 🔗 2. Web3 & Loyalty Gamification (Polygon Integration)
+*   **NFT Connectivity**: Xác thực quyền sở hữu NFT (Stuffy Diamond VIP) trên mạng Polygon qua **Alchemy**.
+*   **Dynamic Pricing Rule Engine**: Tự động áp dụng giảm giá "bí mật" 20% cho chủ sở hữu NFT tại Runtime.
 
-### Local Development (Live Mode)
-To start all applications simultaneously using Turborepo, run the following in the root directory:
-```bash
-npm install
-npm run dev
-```
-The application will be available at `http://localhost:3000`.
+### 🛡️ 3. Resilient Image Edge Proxy & Circuit Breaker
+*   Toàn bộ ảnh sản phẩm được proxy qua **ResilienceService**.
+*   Sử dụng **Circuit Breaker (Opossum)**: Nếu `image-service` gặp sự cố, hệ thống sẽ tự động chuyển sang nạp ảnh gốc (Unsplash) để bảo vệ trải nghiệm người dùng.
 
-### Production Simulation (Docker)
-To build and run the entire ecosystem locally using Docker Compose:
-```bash
-docker-compose up -d --build
-```
+### 🚦 4. Distributed Governance Registry
+*   Cấu hình MFE không còn bị "đóng cứng" trong mã nguồn. 
+*   Quản trị viên có thể **chuyển phiên bản (Rollback/Switch)** MFEs ngay lập tức thông qua Database Registry mà không cần Re-deploy App Shell.
 
-## Documentation
-- **UI Components**: Run `npm run storybook` in the `design-system-app` directory to view the interactive documentation for shared components.
-- **API Models**: Shared data interfaces are centrally defined in `packages/types`.
+---
 
-## Security and Best Practices
-- **Cookie-based Auth**: Utilizes HttpOnly cookies for secure authentication handling.
-- **Content Security**: Implements skeletal loading and error boundaries to ensure a resilient user experience during network instability.
+## 🛠️ Tech Stack & Infrastructure
+
+-   **Frontend**: React 18, Webpack 5 (Module Federation), Zustand (State Management), Framer Motion (Animation).
+-   **Backend**: Node.js (ESM), Express, Apollo Server (GraphQL Federation).
+-   **Databases**: MongoDB (Persistence), Redis (High-Speed Cache, Rate Limiting).
+-   **Messaging**: RabbitMQ (Asynchronous Tasks & Event Sync).
+-   **Observability**: Sentry (Error Tracking), OpenTelemetry (Tracing), Honeycomb (Observability).
+-   **DevOps**: Docker, GitHub Actions (CI/CD Matrix), Render (Cloud Hosting).
+
+---
+
+## 🏗️ Hướng dẫn Triển khai (Cloud - Render)
+
+Để hệ thống hoạt động đầy đủ tính năng, bạn cần cấu hình các biến môi trường sau vào **Environment Group** trên Render của bạn:
+
+### 🔑 Các Khóa Môi trường (Environment Variables):
+-   `MONGO_URI`: URL kết nối MongoDB Atlas (Gói Free M0).
+-   `REDIS_URL`: URL kết nối Redis từ Upstash (Sử dụng `rediss://` cho SSL).
+-   `RABBIT_URL`: URL kết nối RabbitMQ từ CloudAMQP.
+-   `GEMINI_API_KEY`: API Key lấy từ Google AI Studio.
+-   `POLYGON_RPC`: RPC Endpoint từ Alchemy để đọc Blockchain.
+-   `STUFFY_INTERNAL_SECRET`: Một chuỗi bí mật bất kỳ dùng cho Zero-Trust Auth.
+-   `OTEL_EXPORTER_OTLP_ENDPOINT`: `https://api.honeycomb.io/v1/traces` (Nếu dùng Honeycomb).
+
+---
+
+## 🚀 Quy trình CI/CD (GitHub Actions)
+
+Mọi thay đổi trên toàn bộ monorepo đều được kiểm soát bởi quy trình CI/CD Ma trận thông minh:
+1.  **Linter & Build**: Tự động kiểm tra cú pháp và build cho toàn bộ 15+ apps cùng lúc.
+2.  **Docker Guard**: Đẩy Image lên **GitHub Container Registry (GHCR)** với cơ chế cô lập Build Context.
+3.  **Automatic Provisioning**: Sử dụng **Render Deploy Webhooks** để cập nhật 15+ dịch vụ Cloud ngay khi có commit thành công.
+
+---
+
+## 🛡️ Cam kết Chất lượng
+*   **100% Cloud-Synchronized**: Không còn bất kỳ đường dẫn `localhost` nào trong mã nguồn Production.
+*   **Zero-Downtime Resilience**: Cơ chế tự phục hồi (Self-Healing) tích hợp trong mỗi Microservice.
+*   **Enterprise Security**: Xác thực liên dịch vụ (Inter-service Auth) qua JWT Internal.
+
+---
+
+*Phát triển bởi đội ngũ Stuffy Supermarket Elite Developers. 🚀🛡️💎🎯*
