@@ -7,8 +7,9 @@ async function orchestrate() {
   const manifest = await loadMfeManifest();
   const remoteInjections = [];
   
-  // 🏦 DYNAMIC REGISTRY: Inject every remote listed in the manifest
+  // 🏦 DYNAMIC REGISTRY: Inject every remote listed in the manifest (Skip the host container)
   for (const [name, url] of Object.entries(manifest)) {
+    if (name === 'container') continue; 
     remoteInjections.push(injectRemoteScript(name, url));
   }
   

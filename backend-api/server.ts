@@ -185,6 +185,7 @@ mongoose.connect(mongoURI)
     };
 
     try {
+      await MfeModule.deleteOne({ name: 'container' }); // 🛡️ CRITICAL: Remove host from registry to prevent self-injection
       for (const [name, url] of Object.entries(MFE_DEFAULTS)) {
         const mfe = await MfeModule.findOne({ name });
         if (!mfe) {
