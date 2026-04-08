@@ -176,7 +176,6 @@ mongoose.connect(mongoURI)
       product: "https://stuffy-product-app.onrender.com/remoteEntry.js",
       cart: "https://stuffy-cart-app.onrender.com/remoteEntry.js",
       admin: "https://stuffy-admin-app.onrender.com/remoteEntry.js",
-      container: "https://stuffy-container.onrender.com/remoteEntry.js",
       store: "https://stuffy-store-app.onrender.com/remoteEntry.js",
       profile: "https://stuffy-profile-app.onrender.com/remoteEntry.js",
       marketing: "https://stuffy-marketing-app.onrender.com/remoteEntry.js",
