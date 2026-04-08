@@ -4,24 +4,27 @@
  */
 
 export const loadMfeManifest = async () => {
+    const FALLBACK = {
+        store: "https://stuffy-store-app.onrender.com/remoteEntry.js",
+        header: "https://stuffy-header-app.onrender.com/remoteEntry.js",
+        product: "https://stuffy-product-app.onrender.com/remoteEntry.js",
+        cart: "https://stuffy-cart-app.onrender.com/remoteEntry.js",
+        admin: "https://stuffy-admin-app.onrender.com/remoteEntry.js",
+        profile: "https://stuffy-profile-app.onrender.com/remoteEntry.js",
+        marketing: "https://stuffy-marketing-app.onrender.com/remoteEntry.js",
+        support: "https://stuffy-support-app.onrender.com/remoteEntry.js",
+        design_system: "https://stuffy-design-system-app.onrender.com/remoteEntry.js",
+        viewer: "https://stuffy-3d-viewer-app.onrender.com/remoteEntry.js"
+    };
+
     try {
         const res = await fetch("https://stuffy-backend-api.onrender.com/api/registry/manifest");
         const manifest = await res.json();
-        return manifest;
+        // 🛡️ HYBRID REGISTRY: Merge Registry with Fallbacks ensuring all keys exist
+        return { ...FALLBACK, ...manifest };
     } catch (err) {
-        console.error("[Orchestrator] Failed to fetch MFE Manifest, falling back to defaults.", err);
-        return {
-            store: "https://stuffy-store-app.onrender.com/remoteEntry.js",
-            header: "https://stuffy-header-app.onrender.com/remoteEntry.js",
-            product: "https://stuffy-product-app.onrender.com/remoteEntry.js",
-            cart: "https://stuffy-cart-app.onrender.com/remoteEntry.js",
-            admin: "https://stuffy-admin-app.onrender.com/remoteEntry.js",
-            profile: "https://stuffy-profile-app.onrender.com/remoteEntry.js",
-            marketing: "https://stuffy-marketing-app.onrender.com/remoteEntry.js",
-            support: "https://stuffy-support-app.onrender.com/remoteEntry.js",
-            design_system: "https://stuffy-design-system-app.onrender.com/remoteEntry.js",
-            viewer: "https://stuffy-3d-viewer-app.onrender.com/remoteEntry.js"
-        };
+        console.error("[Orchestrator] Failed to fetch MFE Manifest, using local registry.", err);
+        return FALLBACK;
     }
 };
 
