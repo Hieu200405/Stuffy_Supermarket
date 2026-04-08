@@ -2,8 +2,11 @@ import CircuitBreaker from 'opossum';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
+const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
 const INTERNAL_SECRET = process.env.STUFFY_INTERNAL_SECRET || 'stuffy_secret_2026';
-const IMAGE_SERVICE_URL = process.env.IMAGE_SERVICE_URL || 'http://localhost:3009';
+const IMAGE_SERVICE_URL = process.env.IMAGE_SERVICE_URL || (isProduction 
+    ? 'https://stuffy-image-service.onrender.com' 
+    : 'http://localhost:3009');
 
 const generateInternalToken = () => {
     return jwt.sign({ 
