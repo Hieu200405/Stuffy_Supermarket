@@ -169,6 +169,37 @@ const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/stuffy_db';
 mongoose.connect(mongoURI)
   .then(async () => {
     console.log('[MongoDB] Connection established successfully.');
+    
+    // --- GOVERNANCE REGISTRY SEEDER ---
+    const MFE_DEFAULTS = {
+      header: "https://stuffy-header-app.onrender.com/remoteEntry.js",
+      product: "https://stuffy-product-app.onrender.com/remoteEntry.js",
+      cart: "https://stuffy-cart-app.onrender.com/remoteEntry.js",
+      admin: "https://stuffy-admin-app.onrender.com/remoteEntry.js",
+      container: "https://stuffy-container.onrender.com/remoteEntry.js",
+      store: "https://stuffy-store-app.onrender.com/remoteEntry.js",
+      profile: "https://stuffy-profile-app.onrender.com/remoteEntry.js",
+      marketing: "https://stuffy-marketing-app.onrender.com/remoteEntry.js",
+      support: "https://stuffy-support-app.onrender.com/remoteEntry.js",
+      design_system: "https://stuffy-design-system-app.onrender.com/remoteEntry.js",
+      viewer: "https://stuffy-3d-viewer-app.onrender.com/remoteEntry.js",
+    };
+
+    try {
+      for (const [name, url] of Object.entries(MFE_DEFAULTS)) {
+        const mfe = await MfeModule.findOne({ name });
+        if (!mfe) {
+          await MfeModule.create({ name, activeUrl: url, versions: [{ version: "1.0.0", url, status: "stable", rollbackAvailable: true }] });
+          console.log(`[Registry] 🌱 Seeded MFE: ${name}`);
+        } else if (mfe.activeUrl.includes('localhost')) {
+          // 🛡️ AUTO-MIGRATE: If production registry has localhost URLs, update them to Render
+          mfe.activeUrl = url;
+          await mfe.save();
+          console.log(`[Registry] 🔄 Migrated MFE to Cloud: ${name}`);
+        }
+      }
+    } catch (err) { console.error("[Registry] ❌ Seeding failed:", err); }
+
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany([
