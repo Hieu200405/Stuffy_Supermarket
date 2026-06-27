@@ -86,6 +86,24 @@ const authCheckoutLimiter = rateLimit({
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+
+// Hold requests during Cold Start to prevent 404s
+let isGatewayReady = false;
+app.use('/graphql', async (req, res, next) => {
+  if (!isGatewayReady) {
+    console.log(`[GraphQL Gateway] Request received but gateway is still starting. Holding connection...`);
+    let waitAttempts = 0;
+    while (!isGatewayReady && waitAttempts < 120) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      waitAttempts++;
+    }
+    if (!isGatewayReady) {
+      return res.status(504).json({ error: 'Gateway timeout waiting for subgraphs to start.' });
+    }
+  }
+  next();
+});
+
 const httpServer = http.createServer(app);
 
 // Configure the Gateway to pull from our subgraphs
@@ -207,6 +225,7 @@ async function startServer() {
 
   app.use('/graphql', expressMiddleware(server) as any);
   
+  isGatewayReady = true;
   console.log(`[GraphQL Gateway] Subgraphs ready. GraphQL endpoint attached.`);
 };
 
